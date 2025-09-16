@@ -2,6 +2,7 @@ package com.cspl.paynpark;
 
 import static java.lang.Math.ceil;
 
+import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -10,16 +11,34 @@ import android.os.Bundle;
 
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.cspl.paynpark.api.Api;
 import com.cspl.paynpark.databinding.ActivityOutTicketGenerationBinding;
+import com.cspl.paynpark.dbhelper.AppDatabase;
+import com.cspl.paynpark.model.VehicFare;
+import com.cspl.paynpark.model.VehicType;
 import com.cspl.paynpark.print.PrinterHelper;
 import com.ftpos.library.smartpos.errcode.ErrCode;
 import com.ftpos.library.smartpos.printer.AlignStyle;
 import com.ftpos.library.smartpos.printer.OnPrinterCallback;
 import com.ftpos.library.smartpos.printer.PrintStatus;
 import com.ftpos.library.smartpos.printer.Printer;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class OutTicketGenerationActivity extends AppCompatActivity {
     private ActivityOutTicketGenerationBinding binding;
@@ -48,6 +67,7 @@ public class OutTicketGenerationActivity extends AppCompatActivity {
     }
 
     public void init(String recpNo, String date, String vehNo, String vehType, String outTime, int amt) {
+
         binding.textTicketNo.setText(recpNo);
         binding.textDate.setText(date);
         binding.textVehicleNo.setText(vehNo);

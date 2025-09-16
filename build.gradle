@@ -58,6 +58,8 @@ dependencies {
     implementation 'com.google.zxing:core:3.5.2'
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+    //volley
+    implementation 'com.android.volley:volley:1.2.1'
 
 
 }

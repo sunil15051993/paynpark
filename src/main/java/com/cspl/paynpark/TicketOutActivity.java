@@ -1,5 +1,6 @@
 package com.cspl.paynpark;
 
+import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,18 +12,34 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.cspl.paynpark.api.Api;
 import com.cspl.paynpark.databinding.ActivityTicketInBinding;
 import com.cspl.paynpark.databinding.ActivityTicketOutBinding;
 import com.cspl.paynpark.dbhelper.AppDatabase;
 import com.cspl.paynpark.model.Ticket;
+import com.cspl.paynpark.model.VehicFare;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class TicketOutActivity extends AppCompatActivity {
     private ActivityTicketOutBinding binding;
@@ -32,6 +49,7 @@ public class TicketOutActivity extends AppCompatActivity {
             "Hourly", "Daily", "Monthly");
     int ticketCounter = 0;
     private int totalPrice;
+    private ProgressDialog pdDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +64,71 @@ public class TicketOutActivity extends AppCompatActivity {
         String vehType = intent.getString("vehType");
         String inTime = intent.getString("inTime");
 
+        callGetPrice();
         init(recpNo,date,vehNo,vehType,inTime);
+    }
+
+    private void callGetPrice() {
+        pdDialog = new ProgressDialog(TicketOutActivity.this);
+        pdDialog.setTitle("Please wait...");
+        pdDialog.setCancelable(false);
+
+        String url = Api.VEHICLE_FARE;
+
+        pdDialog.show();
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET,url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        pdDialog.dismiss();
+                        try {
+                            Log.e("res_type", response);
+
+                            // Response is a JSON object, not a JSON array
+                            JSONObject rootObj = new JSONObject(response);
+                            AppDatabase db = AppDatabase.getInstance(TicketOutActivity.this);
+                            ExecutorService executor = Executors.newSingleThreadExecutor();
+                            // Loop through vehicle types (keys)
+                            Iterator<String> keys = rootObj.keys();
+                            while (keys.hasNext()) {
+                                String vehicleType = keys.next();
+                                JSONArray faresArray = rootObj.getJSONArray(vehicleType);
+
+                                for (int i = 0; i < faresArray.length(); i++) {
+                                    JSONObject fareObj = faresArray.getJSONObject(i);
+
+                                    int hours = fareObj.getInt("hours");
+                                    int price = fareObj.getInt("price");
+
+                                    VehicFare fare = new VehicFare(vehicleType, hours, price);
+                                    executor.execute(() -> db.fareDao().insert(fare));
+                                }
+                            }
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Log.e("category_error", "Error: " + e.getMessage());
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        pdDialog.dismiss();
+                        Log.e("RequestError", "Registration Error: " + error.toString());
+                        Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                    }
+                }) {
+            @Override
+            protected Map<String, String> getParams() {
+                return new HashMap<>();
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(TicketOutActivity.this);
+        requestQueue.add(stringRequest);
+
     }
 
     public void init(String recpNo, String inDate, String vehNo, String vehType, String inTime){
@@ -95,6 +177,7 @@ public class TicketOutActivity extends AppCompatActivity {
         binding.buttonGenerate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                AppDatabase db = AppDatabase.getInstance(TicketOutActivity.this);
 
                 String outTime = binding.edittextOutTime.getText().toString();
                 String outDate = binding.edittextOutDate.getText().toString();
@@ -119,7 +202,16 @@ public class TicketOutActivity extends AppCompatActivity {
                             diffHours += 1;  // Round up to next hour
                         }
                         // Price per hour
-                        int pricePerHour = 10;
+                        VehicFare fare = db.fareDao().getFareFor(vehType, (int) diffHours);
+                        int pricePerHour = 0;
+                        if (fare != null) {
+                            pricePerHour = fare.getPrice();   // set db price
+                        } else {
+                            Log.e("fare_check", "No fare found for " + vehType + " at " + diffHours + " hours");
+                        }
+
+                        totalPrice = (int) (diffHours * pricePerHour);
+                        Log.e("fare_result", "Total: " + totalPrice);
                         totalPrice = (int) diffHours * pricePerHour;
 
                         String totalHrs = diffHours + " hrs";
@@ -132,7 +224,7 @@ public class TicketOutActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                AppDatabase db = AppDatabase.getInstance(TicketOutActivity.this);
+//                AppDatabase db = AppDatabase.getInstance(TicketOutActivity.this);
                 db.ticketDao().updateTicket(recpNo, outTime, totalPrice);
                 Intent generate = new Intent(TicketOutActivity.this, OutTicketGenerationActivity.class);
                 generate.putExtra("receipt_no",recpNo);

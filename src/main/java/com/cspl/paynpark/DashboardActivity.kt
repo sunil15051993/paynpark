@@ -29,7 +29,7 @@ class DashboardActivity : AppCompatActivity() {
             startActivity(intent)
         }
         binding.cardScan.setOnClickListener {
-            binding.iconReport.setImageResource(R.mipmap.ic_scanner_clr)
+            binding.iconScan.setImageResource(R.mipmap.ic_scanner_clr)
             val intent = Intent(this, ScannerActivity::class.java)
             startActivity(intent)
         }

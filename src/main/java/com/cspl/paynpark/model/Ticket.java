@@ -2,6 +2,7 @@ package com.cspl.paynpark.model;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+
 @Entity(tableName = "tickets")
 public class Ticket {
     @PrimaryKey(autoGenerate = true)
