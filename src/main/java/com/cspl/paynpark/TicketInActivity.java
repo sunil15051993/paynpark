@@ -3,6 +3,7 @@ package com.cspl.paynpark;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -48,6 +49,7 @@ public class TicketInActivity extends AppCompatActivity {
             "Hourly", "Daily", "Monthly");
     int ticketCounter = 0;
     private ProgressDialog pdDialog;
+    private SharedPreferences myPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,12 +57,23 @@ public class TicketInActivity extends AppCompatActivity {
         binding = ActivityTicketInBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        myPref = getSharedPreferences("paynpark", MODE_PRIVATE);
+        boolean call = myPref.getBoolean("api_vh_type",false);
+
         init();
 
-        callVehicleType();
+        if(!call) {
+            callVehicleType();
+        }
     }
 
     public void init(){
+        binding.imageRefresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               callVehicleType();
+            }
+        });
         AppDatabase db = AppDatabase.getInstance(this);
 
         db.typeDao().getAllTypes().observe(this, typeList -> {
@@ -176,6 +189,10 @@ public class TicketInActivity extends AppCompatActivity {
                                 VehicType types = new VehicType(vehicleType);
                                 AppDatabase db = AppDatabase.getInstance(TicketInActivity.this);
                                 db.typeDao().insert(types);
+                                SharedPreferences.Editor editor = myPref.edit();
+                                editor.putBoolean("api_vh_type",true);
+                                editor.apply();
+
                             }
 
                         } catch (Exception e) {

@@ -18,7 +18,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:weightSum="2">
+                android:weightSum="3">
 
                 <ImageView
                     android:id="@+id/imageBack"
@@ -29,12 +29,19 @@
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1.9"
+                    android:layout_weight="2.9"
                     android:gravity="center"
                     android:text="Ticket"
                     android:textColor="@color/white"
                     android:textSize="22sp"
                     android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/imageRefresh"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:padding="2dp"
+                    android:src="@mipmap/reload" />
 
             </LinearLayout>
 

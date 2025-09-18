@@ -17,4 +17,7 @@ public interface TicketDao {
 
     @Query("UPDATE tickets SET outTime = :outTime, amount = :totalPrice WHERE ticketNo = :recpNo")
     void updateTicket(String recpNo, String outTime, int totalPrice);
+
+    @Query("SELECT * FROM tickets WHERE vehicleNo = :vehicleNo AND date = :date LIMIT 1")
+    Ticket getTicketByVehicleAndDate(String vehicleNo, String date);
 }

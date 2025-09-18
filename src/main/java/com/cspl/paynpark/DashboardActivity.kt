@@ -33,6 +33,12 @@ class DashboardActivity : AppCompatActivity() {
             val intent = Intent(this, ScannerActivity::class.java)
             startActivity(intent)
         }
+        binding.cardInput.setOnClickListener {
+            binding.iconInput.setImageResource(R.mipmap.ic_search_clr)
+            val intent = Intent(this, FindActivity::class.java)
+            startActivity(intent)
+        }
+
 
 
     }

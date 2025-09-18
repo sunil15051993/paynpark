@@ -3,6 +3,7 @@ package com.cspl.paynpark;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -50,6 +51,7 @@ public class TicketOutActivity extends AppCompatActivity {
     int ticketCounter = 0;
     private int totalPrice;
     private ProgressDialog pdDialog;
+    private SharedPreferences myPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +66,12 @@ public class TicketOutActivity extends AppCompatActivity {
         String vehType = intent.getString("vehType");
         String inTime = intent.getString("inTime");
 
-        callGetPrice();
+        myPref = getSharedPreferences("paynpark", MODE_PRIVATE);
+        boolean call = myPref.getBoolean("api_vh_fare",false);
+
+        if(!call) {
+            callGetPrice();
+        }
         init(recpNo,date,vehNo,vehType,inTime);
     }
 
@@ -77,23 +84,27 @@ public class TicketOutActivity extends AppCompatActivity {
 
         pdDialog.show();
 
-        StringRequest stringRequest = new StringRequest(Request.Method.GET,url,
+        StringRequest stringRequest = new StringRequest(Request.Method.GET,url + "?username=abc",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         pdDialog.dismiss();
                         try {
                             Log.e("res_type", response);
+                            Log.e("res_type", url);
 
-                            // Response is a JSON object, not a JSON array
                             JSONObject rootObj = new JSONObject(response);
+
+                            JSONObject faresMatrix = rootObj.getJSONObject("fares_matrix");
+
                             AppDatabase db = AppDatabase.getInstance(TicketOutActivity.this);
                             ExecutorService executor = Executors.newSingleThreadExecutor();
+
                             // Loop through vehicle types (keys)
-                            Iterator<String> keys = rootObj.keys();
+                            Iterator<String> keys = faresMatrix.keys();
                             while (keys.hasNext()) {
                                 String vehicleType = keys.next();
-                                JSONArray faresArray = rootObj.getJSONArray(vehicleType);
+                                JSONArray faresArray = faresMatrix.getJSONArray(vehicleType);
 
                                 for (int i = 0; i < faresArray.length(); i++) {
                                     JSONObject fareObj = faresArray.getJSONObject(i);
@@ -103,6 +114,9 @@ public class TicketOutActivity extends AppCompatActivity {
 
                                     VehicFare fare = new VehicFare(vehicleType, hours, price);
                                     executor.execute(() -> db.fareDao().insert(fare));
+                                    SharedPreferences.Editor editor = myPref.edit();
+                                    editor.putBoolean("api_vh_fare",true);
+                                    editor.apply();
                                 }
                             }
 
@@ -122,7 +136,9 @@ public class TicketOutActivity extends AppCompatActivity {
                 }) {
             @Override
             protected Map<String, String> getParams() {
-                return new HashMap<>();
+                Map<String, String> params = new HashMap<>();
+                params.put("username","abc");
+                return params;
             }
         };
 
@@ -132,6 +148,12 @@ public class TicketOutActivity extends AppCompatActivity {
     }
 
     public void init(String recpNo, String inDate, String vehNo, String vehType, String inTime){
+        binding.imageRefresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                callGetPrice();
+            }
+        });
        binding.edittextVhicleRec.setText(recpNo);
        binding.edittextVhicleNo.setText(vehNo);
        binding.spinnerVehicleType.setText(vehType);
@@ -203,7 +225,7 @@ public class TicketOutActivity extends AppCompatActivity {
                         }
                         // Price per hour
                         VehicFare fare = db.fareDao().getFareFor(vehType, (int) diffHours);
-                        int pricePerHour = 0;
+                        int pricePerHour = 10;
                         if (fare != null) {
                             pricePerHour = fare.getPrice();   // set db price
                         } else {

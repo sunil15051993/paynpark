@@ -187,7 +187,7 @@
                         android:layout_height="50dp"
                         android:layout_gravity="center"
                         android:contentDescription="icon"
-                        android:src="@mipmap/ic_report" />
+                        android:src="@mipmap/ic_search" />
 
                     <TextView
                         android:id="@+id/txtInput"

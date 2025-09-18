@@ -31,18 +31,11 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="2.9"
                     android:gravity="center"
-                    android:text="Ticket"
+                    android:text="Find"
                     android:layout_gravity="center_vertical"
                     android:textColor="@color/white"
                     android:textSize="22sp"
                     android:textStyle="bold" />
-
-                <ImageView
-                    android:id="@+id/imageRefresh"
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
-                    android:padding="2dp"
-                    android:src="@mipmap/reload" />
 
             </LinearLayout>
 
@@ -70,55 +63,6 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/textInputLayout"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:hint="Vehicle Type">
-
-                <AutoCompleteTextView
-                    android:id="@+id/spinnerVehicleType"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="none" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/TextInputLayoutDuration"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:hint="Duration Type">
-
-                <AutoCompleteTextView
-                    android:id="@+id/spinnerDuration"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="none" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/textIn"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edittextInTime"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:clickable="true"
-                    android:focusable="false"
-                    android:hint="In Time"
-                    android:inputType="none" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textDate"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
@@ -131,15 +75,15 @@
                     android:layout_height="wrap_content"
                     android:clickable="true"
                     android:focusable="false"
-                    android:hint="Current Date"
+                    android:hint="Date"
                     android:inputType="none" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/buttonGenerate"
+                android:id="@+id/buttonFind"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Generate"
+                android:text="Find"
                 app:cornerRadius="8dp"
                 android:layout_marginTop="15dp"
                 android:textAllCaps="false"
