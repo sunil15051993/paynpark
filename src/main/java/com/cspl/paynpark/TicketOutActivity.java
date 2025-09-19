@@ -84,7 +84,7 @@ public class TicketOutActivity extends AppCompatActivity {
 
         pdDialog.show();
 
-        StringRequest stringRequest = new StringRequest(Request.Method.GET,url + "?username=abc",
+        StringRequest stringRequest = new StringRequest(Request.Method.POST,url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
