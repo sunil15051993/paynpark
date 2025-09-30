@@ -39,6 +39,9 @@ public class ReportGenerateActivity extends AppCompatActivity {
         String emp = "abcd";
         Log.e("Report", "onCreate: "+ date);
 
+        this.printer = MainActivity.printer;
+        printerHelper = new PrinterHelper(printer);
+
         initMethod(date,emp);
 
     }
@@ -76,7 +79,7 @@ public class ReportGenerateActivity extends AppCompatActivity {
                 binding.textNo.setText(noOfTickets.toString());
                 binding.textAmt.setText(totalAmts.toString());
                 binding.textUserName.setText("Staff name: " + emp);
-                binding.textTotalCol.setText("Total Collection " + String.valueOf(grandTotal));
+                binding.textTotalCol.setText("Total Collection: " + String.valueOf(grandTotal));
             });
         });
 
