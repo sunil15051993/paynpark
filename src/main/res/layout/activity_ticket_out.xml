@@ -36,13 +36,6 @@
                     android:textSize="22sp"
                     android:textStyle="bold" />
 
-                <ImageView
-                    android:id="@+id/imageRefresh"
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
-                    android:padding="2dp"
-                    android:src="@mipmap/reload" />
-
             </LinearLayout>
 
         </androidx.appcompat.widget.Toolbar>

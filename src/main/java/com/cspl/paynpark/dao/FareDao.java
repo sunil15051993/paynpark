@@ -21,4 +21,7 @@ public interface FareDao {
     @Query("SELECT * FROM vehfare")
     List<VehicFare> getAllFare();
 
+    @Query("SELECT * FROM vehfare WHERE vehicleType = :vehicleType AND hours = :hours LIMIT 1")
+    VehicFare getFarePrice(String vehicleType, int hours);
+
 }

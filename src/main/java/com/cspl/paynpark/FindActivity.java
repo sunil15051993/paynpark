@@ -37,6 +37,12 @@ public class FindActivity extends AppCompatActivity {
     }
 
     private void initView() {
+        binding.imageBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
         binding.edittextDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

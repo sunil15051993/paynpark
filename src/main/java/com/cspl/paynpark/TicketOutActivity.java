@@ -48,8 +48,8 @@ public class TicketOutActivity extends AppCompatActivity {
             "Two Wheeler", "Four Wheeler", "Heavy Vehicle");
     List<String> durationType = Arrays.asList(
             "Hourly", "Daily", "Monthly");
-    int ticketCounter = 0;
     private int totalPrice;
+    private int diffAmt;
     private ProgressDialog pdDialog;
     private SharedPreferences myPref;
 
@@ -65,95 +65,19 @@ public class TicketOutActivity extends AppCompatActivity {
         String vehNo = intent.getString("vehNo");
         String vehType = intent.getString("vehType");
         String inTime = intent.getString("inTime");
+        String paid = intent.getString("paid");
 
-        myPref = getSharedPreferences("paynpark", MODE_PRIVATE);
-        boolean call = myPref.getBoolean("api_vh_fare",false);
-
-        if(!call) {
-            callGetPrice();
-        }
-        init(recpNo,date,vehNo,vehType,inTime);
+        init(recpNo,date,vehNo,vehType,inTime, Integer.parseInt(paid));
     }
 
-    private void callGetPrice() {
-        pdDialog = new ProgressDialog(TicketOutActivity.this);
-        pdDialog.setTitle("Please wait...");
-        pdDialog.setCancelable(false);
-
-        String url = Api.VEHICLE_FARE;
-
-        pdDialog.show();
-
-        StringRequest stringRequest = new StringRequest(Request.Method.POST,url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        pdDialog.dismiss();
-                        try {
-                            Log.e("res_type", response);
-                            Log.e("res_type", url);
-
-                            JSONObject rootObj = new JSONObject(response);
-
-                            JSONObject faresMatrix = rootObj.getJSONObject("fares_matrix");
-
-                            AppDatabase db = AppDatabase.getInstance(TicketOutActivity.this);
-                            ExecutorService executor = Executors.newSingleThreadExecutor();
-
-                            // Loop through vehicle types (keys)
-                            Iterator<String> keys = faresMatrix.keys();
-                            while (keys.hasNext()) {
-                                String vehicleType = keys.next();
-                                JSONArray faresArray = faresMatrix.getJSONArray(vehicleType);
-
-                                for (int i = 0; i < faresArray.length(); i++) {
-                                    JSONObject fareObj = faresArray.getJSONObject(i);
-
-                                    int hours = fareObj.getInt("hours");
-                                    int price = fareObj.getInt("price");
-
-                                    VehicFare fare = new VehicFare(vehicleType, hours, price);
-                                    executor.execute(() -> db.fareDao().insert(fare));
-                                    SharedPreferences.Editor editor = myPref.edit();
-                                    editor.putBoolean("api_vh_fare",true);
-                                    editor.apply();
-                                }
-                            }
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            Log.e("category_error", "Error: " + e.getMessage());
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        pdDialog.dismiss();
-                        Log.e("RequestError", "Registration Error: " + error.toString());
-                        Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_LONG).show();
-                    }
-                }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                params.put("username","abc");
-                return params;
-            }
-        };
-
-        RequestQueue requestQueue = Volley.newRequestQueue(TicketOutActivity.this);
-        requestQueue.add(stringRequest);
-
-    }
-
-    public void init(String recpNo, String inDate, String vehNo, String vehType, String inTime){
-        binding.imageRefresh.setOnClickListener(new View.OnClickListener() {
+    public void init(String recpNo, String inDate, String vehNo, String vehType, String inTime, int paid){
+        binding.imageBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                callGetPrice();
+                onBackPressed();
             }
         });
+
        binding.edittextVhicleRec.setText(recpNo);
        binding.edittextVhicleNo.setText(vehNo);
        binding.spinnerVehicleType.setText(vehType);
@@ -199,65 +123,73 @@ public class TicketOutActivity extends AppCompatActivity {
         binding.buttonGenerate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AppDatabase db = AppDatabase.getInstance(TicketOutActivity.this);
+                if (binding.edittextOutTime.length() == 0) {
+                    binding.edittextOutTime.requestFocus();
+                    binding.edittextOutTime.setError("FIELD CANNOT BE EMPTY");
+                } else {
+                    AppDatabase db = AppDatabase.getInstance(TicketOutActivity.this);
 
-                String outTime = binding.edittextOutTime.getText().toString();
-                String outDate = binding.edittextOutDate.getText().toString();
+                    String outTime = binding.edittextOutTime.getText().toString();
+                    String outDate = binding.edittextOutDate.getText().toString();
 
-                try {
-                    String inDateTime = inDate + " " + inTime;   // e.g. "03-09-2025 08:30 PM"
-                    String outDateTime = outDate + " " + outTime; // e.g. "03-09-2025 09:30 PM"
+                    try {
+                        String inDateTime = inDate + " " + inTime;   // e.g. "03-09-2025 08:30 PM"
+                        String outDateTime = outDate + " " + outTime; // e.g. "03-09-2025 09:30 PM"
 
-                    // Use 12-hour format with AM/PM
-                    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm a", Locale.getDefault());
+                        // Use 12-hour format with AM/PM
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm a", Locale.getDefault());
 
-                    Date inDateObj = sdf.parse(inDateTime);
-                    Date outDateObj = sdf.parse(outDateTime);
+                        Date inDateObj = sdf.parse(inDateTime);
+                        Date outDateObj = sdf.parse(outDateTime);
 
-                    if (inDateObj != null && outDateObj != null) {
-                        long diffInMillis = outDateObj.getTime() - inDateObj.getTime();
+                        if (inDateObj != null && outDateObj != null) {
+                            long diffInMillis = outDateObj.getTime() - inDateObj.getTime();
 
-                        long diffHours = diffInMillis / (1000 * 60 * 60);
-                        long diffMinutes = (diffInMillis / (1000 * 60)) % 60;
+                            long diffHours = diffInMillis / (1000 * 60 * 60);
+                            long diffMinutes = (diffInMillis / (1000 * 60)) % 60;
 
-                        if (diffMinutes > 0) {
-                            diffHours += 1;  // Round up to next hour
+                            if (diffMinutes > 0) {
+                                diffHours += 1;  // Round up to next hour
+                            }
+                            // Price per hour
+                            VehicFare fare = db.fareDao().getFareFor(vehType, (int) diffHours);
+                            int pricePerHour = 10;
+                            if (fare != null) {
+                                pricePerHour = fare.getPrice();   // set db price
+                            } else {
+                                Log.e("fare_check", "No fare found for " + vehType + " at " + diffHours + " hours");
+                            }
+
+                            totalPrice = (int) (diffHours * pricePerHour);
+                            Log.e("fare_result", "Total: " + totalPrice);
+                            totalPrice = (int) diffHours * pricePerHour;
+                            diffAmt = totalPrice - paid;
+
+                            String totalHrs = diffHours + " hrs";
+
+                            String result = "Total Time: " + totalHrs + " | Total Price: ₹" + diffAmt;
+
+                            Log.e("TICKET_OUT", "onClick: " + result);
+
                         }
-                        // Price per hour
-                        VehicFare fare = db.fareDao().getFareFor(vehType, (int) diffHours);
-                        int pricePerHour = 10;
-                        if (fare != null) {
-                            pricePerHour = fare.getPrice();   // set db price
-                        } else {
-                            Log.e("fare_check", "No fare found for " + vehType + " at " + diffHours + " hours");
-                        }
-
-                        totalPrice = (int) (diffHours * pricePerHour);
-                        Log.e("fare_result", "Total: " + totalPrice);
-                        totalPrice = (int) diffHours * pricePerHour;
-
-                        String totalHrs = diffHours + " hrs";
-                        String result = "Total Time: " + totalHrs + " | Total Price: ₹" + totalPrice;
-
-                        Log.e("TICKET_OUT", "onClick: " + result);
-
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
 
 //                AppDatabase db = AppDatabase.getInstance(TicketOutActivity.this);
-                db.ticketDao().updateTicket(recpNo, outTime, totalPrice);
-                Intent generate = new Intent(TicketOutActivity.this, OutTicketGenerationActivity.class);
-                generate.putExtra("receipt_no",recpNo);
-                generate.putExtra("date",outDate);
-                generate.putExtra("vehicle_no",vehNo);
-                generate.putExtra("vehicle_type",vehType);
-                generate.putExtra("out_time",outTime);
-                generate.putExtra("amt",totalPrice);
-                startActivity(generate);
+                    db.ticketDao().updateTicket(recpNo, outTime, totalPrice);
+                    Intent generate = new Intent(TicketOutActivity.this, OutTicketGenerationActivity.class);
+                    generate.putExtra("receipt_no", recpNo);
+                    generate.putExtra("date", outDate);
+                    generate.putExtra("vehicle_no", vehNo);
+                    generate.putExtra("vehicle_type", vehType);
+                    generate.putExtra("out_time", outTime);
+                    generate.putExtra("paid", paid);
+                    generate.putExtra("amt", diffAmt);
+                    startActivity(generate);
 
-                Toast.makeText(TicketOutActivity.this, "Data Saved!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TicketOutActivity.this, "Data Saved!", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 

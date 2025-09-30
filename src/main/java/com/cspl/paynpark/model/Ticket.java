@@ -15,10 +15,11 @@ public class Ticket {
     private String inTime;
     private String outTime;
     private String date;
+    private int paid;
     private int amount;
 
     // Constructor
-    public Ticket(String ticketNo,String date, String vehicleNo, String vehicleType, String durationType, String inTime, String outTime, int amount) {
+    public Ticket(String ticketNo,String date, String vehicleNo, String vehicleType, String durationType, String inTime, String outTime, int paid, int amount) {
         this.ticketNo = ticketNo;
         this.date = date;
         this.vehicleNo = vehicleNo;
@@ -26,6 +27,7 @@ public class Ticket {
         this.durationType = durationType;
         this.inTime = inTime;
         this.outTime = outTime;
+        this.paid = paid;
         this.amount = amount;
     }
 
@@ -96,6 +98,14 @@ public class Ticket {
 
     public int getAmount() {
         return amount;
+    }
+
+    public int getPaid() {
+        return paid;
+    }
+
+    public void setPaid(int paid) {
+        this.paid = paid;
     }
 
     public void setAmount(int amount) {

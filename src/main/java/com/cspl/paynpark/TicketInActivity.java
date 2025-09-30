@@ -5,6 +5,7 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -23,6 +24,7 @@ import com.cspl.paynpark.api.Api;
 import com.cspl.paynpark.databinding.ActivityTicketInBinding;
 import com.cspl.paynpark.dbhelper.AppDatabase;
 import com.cspl.paynpark.model.Ticket;
+import com.cspl.paynpark.model.VehicFare;
 import com.cspl.paynpark.model.VehicType;
 
 import org.json.JSONArray;
@@ -43,13 +45,13 @@ import java.util.concurrent.Executors;
 
 public class TicketInActivity extends AppCompatActivity {
     private ActivityTicketInBinding binding;
-//    List<String> vehicleType = Arrays.asList(
+    //    List<String> vehicleType = Arrays.asList(
 //            "Two Wheeler", "Four Wheeler", "Heavy Vehicle");
     List<String> durationType = Arrays.asList(
             "Hourly", "Daily", "Monthly");
-    int ticketCounter = 0;
     private ProgressDialog pdDialog;
     private SharedPreferences myPref;
+    private AppDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,24 +60,29 @@ public class TicketInActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         myPref = getSharedPreferences("paynpark", MODE_PRIVATE);
-        boolean call = myPref.getBoolean("api_vh_type",false);
+        boolean call = myPref.getBoolean("api_vh_type", false);
+        db = AppDatabase.getInstance(TicketInActivity.this);
 
         init();
 
-        if(!call) {
+        if (!call) {
             callVehicleType();
         }
     }
 
-    public void init(){
+    public void init() {
         binding.imageRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               callVehicleType();
+                callVehicleType();
             }
         });
-        AppDatabase db = AppDatabase.getInstance(this);
-
+        binding.imageBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
         db.typeDao().getAllTypes().observe(this, typeList -> {
             List<String> vehicleTypes = new ArrayList<>();
             for (VehicType t : typeList) {
@@ -134,29 +141,64 @@ public class TicketInActivity extends AppCompatActivity {
         binding.buttonGenerate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String date = binding.edittextDate.getText().toString();
-                Random random = new Random();
-                int randomNumber = random.nextInt(1000);  // generates 0–999
-                String ticketNo = "PARK" + randomNumber;
-                Log.e("TicketNumber", ticketNo);
-                String vehicleNo = binding.edittextVhicleNo.getText().toString();
-                String vehicleType = binding.spinnerVehicleType.getText().toString();
-                String durationType = binding.spinnerDuration.getText().toString();
-                String inTime = binding.edittextInTime.getText().toString();
+                if (binding.edittextVhicleNo.length() == 0) {
+                    binding.edittextVhicleNo.requestFocus();
+                    binding.edittextVhicleNo.setError("FIELD CANNOT BE EMPTY");
+                } else if (binding.spinnerVehicleType.length() == 0) {
+                    binding.spinnerVehicleType.requestFocus();
+                    binding.spinnerVehicleType.setError("FIELD CANNOT BE EMPTY");
+                } else if (binding.edittextInTime.length() == 0) {
+                    binding.edittextInTime.requestFocus();
+                    binding.edittextInTime.setError("FIELD CANNOT BE EMPTY");
+                } else {
+                    String date = binding.edittextDate.getText().toString();
+                    Random random = new Random();
+                    int randomNumber = random.nextInt(1000);  // generates 0–999
+                    String ticketNo = "PARK" + randomNumber;
+                    Log.e("TicketNumber", ticketNo);
+                    String vehicleNo = binding.edittextVhicleNo.getText().toString();
+                    String vehicleType = binding.spinnerVehicleType.getText().toString();
+                    String durationType = binding.spinnerDuration.getText().toString();
+                    String inTime = binding.edittextInTime.getText().toString();
 
-                Ticket contact = new Ticket(ticketNo,date,vehicleNo,vehicleType,durationType,inTime,"",0);
-                AppDatabase db = AppDatabase.getInstance(TicketInActivity.this);
-                db.ticketDao().insert(contact);
-                Intent generate = new Intent(TicketInActivity.this, InTicketGenerationActivity.class);
-                generate.putExtra("receipt_no",ticketNo);
-                generate.putExtra("date",date);
-                generate.putExtra("vehicle_no",vehicleNo);
-                generate.putExtra("vehicle_type",vehicleType);
-                generate.putExtra("in_time",inTime);
-                startActivity(generate);
-                finish();
+                    int hours = 1;
+                    try {
+                        hours = Integer.parseInt(durationType.replaceAll("[^0-9]", ""));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
 
-                Toast.makeText(TicketInActivity.this, "Data Saved!", Toast.LENGTH_SHORT).show();
+
+                    int finalHours = hours;
+                    Executors.newSingleThreadExecutor().execute(() -> {
+                        VehicFare fare = db.fareDao().getFarePrice(vehicleType, finalHours); // match vehicleType & hours
+
+                        runOnUiThread(() -> {
+                            if (fare != null) {
+                                int amtPerHr = fare.getPrice();
+                                Log.e("TICKET_IN", "Type: " + vehicleType + " Hours: 1 → Price: " + amtPerHr);
+
+                                // 👉 Now create and insert ticket AFTER amtPerHr is ready
+                                Ticket contact = new Ticket(ticketNo, date, vehicleNo, vehicleType, durationType, inTime, "", amtPerHr, 0);
+                                db = AppDatabase.getInstance(TicketInActivity.this);
+                                Executors.newSingleThreadExecutor().execute(() -> db.ticketDao().insert(contact));
+
+                                Intent generate = new Intent(TicketInActivity.this, InTicketGenerationActivity.class);
+                                generate.putExtra("receipt_no", ticketNo);
+                                generate.putExtra("date", date);
+                                generate.putExtra("vehicle_no", vehicleNo);
+                                generate.putExtra("vehicle_type", vehicleType);
+                                generate.putExtra("in_time", inTime);
+                                generate.putExtra("amt_per_hr", amtPerHr);
+                                startActivity(generate);
+                                finish();
+
+                            } else {
+                                Toast.makeText(TicketInActivity.this, "No fare found!", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    });
+                }
             }
         });
 
@@ -171,7 +213,7 @@ public class TicketInActivity extends AppCompatActivity {
 
         pdDialog.show();
 
-        StringRequest stringRequest = new StringRequest(Request.Method.GET,url,
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -190,7 +232,7 @@ public class TicketInActivity extends AppCompatActivity {
                                 AppDatabase db = AppDatabase.getInstance(TicketInActivity.this);
                                 db.typeDao().insert(types);
                                 SharedPreferences.Editor editor = myPref.edit();
-                                editor.putBoolean("api_vh_type",true);
+                                editor.putBoolean("api_vh_type", true);
                                 editor.apply();
 
                             }

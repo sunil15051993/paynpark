@@ -33,7 +33,7 @@
                     android:layout_gravity="center_vertical"
                     android:layout_weight="2.9"
                     android:gravity="center"
-                    android:text="Ticket Out"
+                    android:text="Ticket In"
                     android:textColor="@color/white"
                     android:textSize="22sp"
                     android:textStyle="bold" />
@@ -53,8 +53,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
             android:background="@drawable/receipt_background"
+            android:layout_marginTop="15dp"
             android:orientation="vertical">
 
             <TextView
@@ -217,7 +217,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:fontFamily="sans-serif-medium"
-                    android:text="Out Time"
+                    android:text="In Time"
                     android:textSize="15sp" />
 
                 <TextView
@@ -230,7 +230,7 @@
                     android:textSize="15sp" />
 
                 <TextView
-                    android:id="@+id/textOuttime"
+                    android:id="@+id/textIntime"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -251,7 +251,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:fontFamily="sans-serif-medium"
-                    android:text="Paid"
+                    android:text="Amt. (per hr)"
                     android:textSize="15sp" />
 
                 <TextView
@@ -264,41 +264,7 @@
                     android:textSize="15sp" />
 
                 <TextView
-                    android:id="@+id/textPaid"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="0"
-                    android:textSize="15sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:weightSum="3">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="Diff.Amount"
-                    android:textSize="15sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.2"
-                    android:fontFamily="sans-serif-medium"
-                    android:gravity="center"
-                    android:text=":"
-                    android:textSize="15sp" />
-
-                <TextView
-                    android:id="@+id/textAmount"
+                    android:id="@+id/textAmtPerHr"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -339,5 +305,6 @@
             android:layout_gravity="center"
             android:layout_marginTop="10dp"
             android:text="Get Print" />
+
     </LinearLayout>
 </ScrollView>

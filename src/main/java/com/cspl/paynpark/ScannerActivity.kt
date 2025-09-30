@@ -33,6 +33,7 @@ class ScannerActivity : AppCompatActivity() {
                 var vehNo = ""
                 var vehType = ""
                 var inTime = ""
+                var paid = ""
 
                 for (line in lines) {
                     when {
@@ -41,16 +42,17 @@ class ScannerActivity : AppCompatActivity() {
                         line.startsWith("Vehicle No:") -> vehNo = line.removePrefix("Vehicle No:").trim()
                         line.startsWith("Vehicle Type:") -> vehType = line.removePrefix("Vehicle Type:").trim()
                         line.startsWith("In Time:") -> inTime = line.removePrefix("In Time:").trim()
+                        line.startsWith("Paid:") -> paid = line.removePrefix("Paid:").trim()
                     }
                 }
 
-                // Pass data to NextActivity
                 val intent = Intent(this, TicketOutActivity::class.java).apply {
                     putExtra("recpNo", recpNo)
                     putExtra("date", date)
                     putExtra("vehNo", vehNo)
                     putExtra("vehType", vehType)
                     putExtra("inTime", inTime)
+                    putExtra("paid", paid)
                 }
                 startActivity(intent)
                 finish()

@@ -17,24 +17,30 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:weightSum="2"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:weightSum="3">
+
+                <ImageView
+                    android:id="@+id/imageRefresh"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:src="@mipmap/reload" />
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Home"
-                    android:textSize="22sp"
-                    android:layout_weight="1.9"
+                    android:layout_weight="2.9"
                     android:gravity="center"
-                    android:textStyle="bold"
-                    android:textColor="@color/white"/>
+                    android:text="Ticket"
+                    android:textColor="@color/white"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
 
                 <ImageView
                     android:id="@+id/imageLogout"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:src="@mipmap/ic_logout"/>
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:src="@mipmap/ic_logout" />
 
             </LinearLayout>
 
@@ -47,7 +53,7 @@
             android:layout_marginTop="5dp"
             android:padding="1dp">
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardTicket"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -82,9 +88,9 @@
                         android:textStyle="bold" />
 
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardReport"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -119,7 +125,7 @@
                         android:textStyle="bold" />
 
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
 
         <LinearLayout
@@ -128,7 +134,7 @@
             android:orientation="horizontal"
             android:padding="1dp">
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardScan"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -163,9 +169,9 @@
                         android:textStyle="bold" />
 
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardInput"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -200,7 +206,7 @@
                         android:textStyle="bold" />
 
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
 
     </LinearLayout>

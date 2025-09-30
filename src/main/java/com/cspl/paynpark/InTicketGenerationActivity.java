@@ -2,6 +2,8 @@ package com.cspl.paynpark;
 
 import static java.lang.Math.ceil;
 
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -10,9 +12,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.cspl.paynpark.databinding.ActivityTicketGenerationBinding;
+import com.cspl.paynpark.databinding.ActivityInTicketGenerationBinding;
+import com.cspl.paynpark.dbhelper.AppDatabase;
+import com.cspl.paynpark.model.HeaderFooter;
 import com.cspl.paynpark.print.PrinterHelper;
 import com.ftpos.library.smartpos.errcode.ErrCode;
 import com.ftpos.library.smartpos.printer.AlignStyle;
@@ -24,8 +29,10 @@ import com.journeyapps.barcodescanner.BarcodeEncoder;
 import com.google.zxing.WriterException;
 import com.google.zxing.qrcode.QRCodeWriter;
 
+import java.util.concurrent.Executors;
+
 public class InTicketGenerationActivity extends AppCompatActivity {
-    private ActivityTicketGenerationBinding binding;
+    private ActivityInTicketGenerationBinding binding;
     private Printer printer;
     private PrinterHelper printerHelper;
 
@@ -33,7 +40,7 @@ public class InTicketGenerationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityTicketGenerationBinding.inflate(getLayoutInflater());
+        binding = ActivityInTicketGenerationBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         Bundle b = getIntent().getExtras();
@@ -42,25 +49,60 @@ public class InTicketGenerationActivity extends AppCompatActivity {
         String vehNo = b.getString("vehicle_no", "");
         String vehType = b.getString("vehicle_type", "");
         String inTime = b.getString("in_time", "");
+        int amtPerHr = b.getInt("amt_per_hr", 0);
 
-        init(recpNo,date,vehNo,vehType,inTime);
+        init(recpNo, date, vehNo, vehType, inTime, amtPerHr);
         this.printer = MainActivity.printer;
         printerHelper = new PrinterHelper(printer);
     }
 
-    public void init(String recpNo, String date, String vehNo, String vehType, String inTime){
+    public void init(String recpNo, String date, String vehNo, String vehType, String inTime, int amtPerHr) {
+        binding.imageBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new AlertDialog.Builder(InTicketGenerationActivity.this)
+                        .setTitle("Exit")
+                        .setMessage("Do you want to exit?")
+                        .setCancelable(false)
+                        .setPositiveButton("Yes", (dialog, which) -> {
+                            callBack();
+                        })
+                        .setNegativeButton("No", (dialog, which) -> {
+                            dialog.dismiss();
+                        })
+                        .show();
+            }
+        });
+        AppDatabase db = AppDatabase.getInstance(InTicketGenerationActivity.this);
+
         binding.textTicketNo.setText(recpNo);
         binding.textDate.setText(date);
         binding.textVehicleNo.setText(vehNo);
         binding.textVehicleType.setText(vehType);
         binding.textIntime.setText(inTime);
+        binding.textAmtPerHr.setText("" + amtPerHr);
+        Executors.newSingleThreadExecutor().execute(() -> {
+            HeaderFooter hf = db.headerFooterDao().getHeaderFooter();
+
+            if (hf != null) {
+                runOnUiThread(() -> {
+
+                    String headerText = hf.getH1() + "\n" + hf.getH2() + "\n" + hf.getH3() + "\n" + hf.getH4();
+                    String footerText = hf.getF1() + "\n" + hf.getF2() + "\n" + hf.getF3() + "\n" + hf.getF4();
+
+                    binding.textHeader1.setText(headerText);
+                    binding.textFooter1.setText(footerText);
+                });
+            }
+        });
 
         // Combine into one string
         String qrData = "Receipt No: " + recpNo + "\n"
                 + "Date: " + date + "\n"
                 + "Vehicle No: " + vehNo + "\n"
                 + "Vehicle Type: " + vehType + "\n"
-                + "In Time: " + inTime;
+                + "In Time: " + inTime + "\n"
+                + "Paid: " + amtPerHr;
 
         // Generate QR code
         QRCodeWriter writer = new QRCodeWriter();
@@ -103,12 +145,14 @@ public class InTicketGenerationActivity extends AppCompatActivity {
             }
 
             // ---- Print Strings ----
-            printerHelper.printText("PARKING RECEIPT", AlignStyle.PRINT_STYLE_CENTER);
+            printerHelper.printText("" + binding.textHeader1.getText(), AlignStyle.PRINT_STYLE_CENTER);
             printerHelper.printText("Receipt No : " + binding.textTicketNo.getText(), AlignStyle.PRINT_STYLE_LEFT);
             printerHelper.printText("Date       : " + binding.textDate.getText(), AlignStyle.PRINT_STYLE_LEFT);
             printerHelper.printText("Vehicle No : " + binding.textVehicleNo.getText(), AlignStyle.PRINT_STYLE_LEFT);
             printerHelper.printText("Vehicle Type : " + binding.textVehicleType.getText(), AlignStyle.PRINT_STYLE_LEFT);
             printerHelper.printText("In Time : " + binding.textIntime.getText(), AlignStyle.PRINT_STYLE_LEFT);
+            printerHelper.printText("Paid : " + binding.textAmtPerHr.getText(), AlignStyle.PRINT_STYLE_LEFT);
+
 
             // ---- Print QR Code ----
             binding.textQR.setDrawingCacheEnabled(true);
@@ -117,7 +161,11 @@ public class InTicketGenerationActivity extends AppCompatActivity {
             printerHelper.printQRCode(qrBitmap);
 
             // ---- Footer ----
-            printerHelper.printFooter("**** Thank You Visit Again ****", "IRCTC Parking - Surat");
+            if (binding.textFooter1.length() == 0) {
+                printerHelper.printFooter("**** Thank You Visit Again ****", "");
+            } else {
+                printerHelper.printFooter(binding.textFooter1.getText().toString(), "");
+            }
 
             // ---- Finish Printing ----
             printerHelper.finishPrint();
@@ -126,8 +174,31 @@ public class InTicketGenerationActivity extends AppCompatActivity {
             e.printStackTrace();
             Log.e("PRINT", "print failed: " + e.getMessage());
         }
+    }
 
+    @SuppressLint("MissingSuperCall")
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setTitle("Exit")
+                .setMessage("Do you want to exit?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    callBack();
+                })
+                .setNegativeButton("No", (dialog, which) -> {
+                    dialog.dismiss();
+                })
+                .show();
+    }
 
+    private void callBack() {
+        Intent dash = new Intent(InTicketGenerationActivity.this, DashboardActivity.class);
+        startActivity(dash);
+        finish();
+    }
+
+}
 
 
 
@@ -291,6 +362,6 @@ public class InTicketGenerationActivity extends AppCompatActivity {
 //        }
 //
 //        return iRet;
-    }
+//    }
 //    private static Paint paint = null;
-}
+
