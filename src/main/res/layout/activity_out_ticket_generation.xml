@@ -332,12 +332,17 @@
 
         </LinearLayout>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/buttongetPrint"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="10dp"
-            android:text="Get Print" />
+            android:layout_marginTop="15dp"
+            android:backgroundTint="#0277BD"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:text="Get Print"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            app:cornerRadius="8dp" />
     </LinearLayout>
 </ScrollView>

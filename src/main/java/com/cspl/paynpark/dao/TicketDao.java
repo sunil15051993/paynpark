@@ -5,6 +5,7 @@ import androidx.room.Insert;
 import androidx.room.Query;
 
 import com.cspl.paynpark.model.Ticket;
+import com.cspl.paynpark.model.TicketReport;
 
 import java.util.List;
 @Dao
@@ -20,4 +21,8 @@ public interface TicketDao {
 
     @Query("SELECT * FROM tickets WHERE vehicleNo = :vehicleNo AND date = :date LIMIT 1")
     Ticket getTicketByVehicleAndDate(String vehicleNo, String date);
+
+    @Query("SELECT vehicleType, COUNT(*) as count, SUM(amount) as totalAmt " +
+            "FROM tickets WHERE date = :date AND log = :emp GROUP BY vehicleType")
+    List<TicketReport> getReportByDate(String date, String emp);
 }

@@ -15,11 +15,11 @@ public class Ticket {
     private String inTime;
     private String outTime;
     private String date;
-    private int paid;
     private int amount;
+    private String log;
 
     // Constructor
-    public Ticket(String ticketNo,String date, String vehicleNo, String vehicleType, String durationType, String inTime, String outTime, int paid, int amount) {
+    public Ticket(String ticketNo,String date, String vehicleNo, String vehicleType, String durationType, String inTime, String outTime, int amount, String log) {
         this.ticketNo = ticketNo;
         this.date = date;
         this.vehicleNo = vehicleNo;
@@ -27,8 +27,8 @@ public class Ticket {
         this.durationType = durationType;
         this.inTime = inTime;
         this.outTime = outTime;
-        this.paid = paid;
         this.amount = amount;
+        this.log = log;
     }
 
     // Getters & Setters
@@ -100,15 +100,14 @@ public class Ticket {
         return amount;
     }
 
-    public int getPaid() {
-        return paid;
-    }
-
-    public void setPaid(int paid) {
-        this.paid = paid;
-    }
-
     public void setAmount(int amount) {
         this.amount = amount;
+    }
+
+    public String getLog() {
+        return log;
+    }
+    public void setLog(String log) {
+        this.log = log;
     }
 }

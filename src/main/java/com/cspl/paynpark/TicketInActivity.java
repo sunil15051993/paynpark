@@ -179,7 +179,7 @@ public class TicketInActivity extends AppCompatActivity {
                                 Log.e("TICKET_IN", "Type: " + vehicleType + " Hours: 1 → Price: " + amtPerHr);
 
                                 // 👉 Now create and insert ticket AFTER amtPerHr is ready
-                                Ticket contact = new Ticket(ticketNo, date, vehicleNo, vehicleType, durationType, inTime, "", amtPerHr, 0);
+                                Ticket contact = new Ticket(ticketNo, date, vehicleNo, vehicleType, durationType, inTime, "", amtPerHr, "abcd");
                                 db = AppDatabase.getInstance(TicketInActivity.this);
                                 Executors.newSingleThreadExecutor().execute(() -> db.ticketDao().insert(contact));
 
