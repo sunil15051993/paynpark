@@ -52,6 +52,7 @@ public class TicketOutActivity extends AppCompatActivity {
     private int diffAmt;
     private ProgressDialog pdDialog;
     private SharedPreferences myPref;
+    private String totalHrs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,7 +166,7 @@ public class TicketOutActivity extends AppCompatActivity {
                             Log.e("fare_result", "Total: " + totalPrice);
                             diffAmt = totalPrice - paid;
 
-                            String totalHrs = diffHours + " hrs";
+                            totalHrs = diffHours + " hrs";
 
                             String result = "Total Time: " + totalHrs + " | Total Price: ₹" + diffAmt;
 
@@ -186,6 +187,7 @@ public class TicketOutActivity extends AppCompatActivity {
                     generate.putExtra("out_time", outTime);
                     generate.putExtra("paid", paid);
                     generate.putExtra("amt", diffAmt);
+                    generate.putExtra("total_hrs", totalHrs);
                     startActivity(generate);
 
                     Toast.makeText(TicketOutActivity.this, "Data Saved!", Toast.LENGTH_SHORT).show();

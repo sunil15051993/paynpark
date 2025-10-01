@@ -62,16 +62,17 @@ public class OutTicketGenerationActivity extends AppCompatActivity {
         String vehNo = b.getString("vehicle_no", "");
         String vehType = b.getString("vehicle_type", "");
         String outTime = b.getString("out_time", "");
+        String totalHrs = b.getString("total_hrs", "");
         int paid = b.getInt("paid", 0);
         int amt = b.getInt("amt", 0);
 
-        init(recpNo, date, vehNo, vehType, outTime, paid, amt);
+        init(recpNo, date, vehNo, vehType, outTime, paid, amt, totalHrs);
 
         this.printer = MainActivity.printer;
         printerHelper = new PrinterHelper(printer);
     }
 
-    public void init(String recpNo, String date, String vehNo, String vehType, String outTime, int paid, int amt) {
+    public void init(String recpNo, String date, String vehNo, String vehType, String outTime, int paid, int amt, String totalHrs) {
         binding.imageBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -98,6 +99,7 @@ public class OutTicketGenerationActivity extends AppCompatActivity {
         binding.textOuttime.setText(outTime);
         binding.textPaid.setText(""+paid);
         binding.textAmount.setText(""+amt);
+        binding.textTotalHrs.setText(totalHrs);
 
         Executors.newSingleThreadExecutor().execute(() -> {
             HeaderFooter hf = db.headerFooterDao().getHeaderFooter();
@@ -149,6 +151,7 @@ public class OutTicketGenerationActivity extends AppCompatActivity {
             printerHelper.printText("Vehicle No : " + binding.textVehicleNo.getText(), AlignStyle.PRINT_STYLE_LEFT);
             printerHelper.printText("Vehicle Type : " + binding.textVehicleType.getText(), AlignStyle.PRINT_STYLE_LEFT);
             printerHelper.printText("Out Time : " + binding.textOuttime.getText(), AlignStyle.PRINT_STYLE_LEFT);
+            printerHelper.printText("Total Hrs : " + binding.textTotalHrs.getText(), AlignStyle.PRINT_STYLE_LEFT);
             printerHelper.printText("Paid : " + binding.textPaid.getText(), AlignStyle.PRINT_STYLE_LEFT);
             printerHelper.printText("Diff.amount : ₹" + binding.textAmount.getText(), AlignStyle.PRINT_STYLE_LEFT);
             printerHelper.printText("---------------------------------------", AlignStyle.PRINT_STYLE_CENTER);
