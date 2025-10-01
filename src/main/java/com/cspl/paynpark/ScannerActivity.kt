@@ -2,6 +2,7 @@ package com.cspl.paynpark
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat.startActivity
 import com.google.zxing.integration.android.IntentIntegrator
@@ -45,6 +46,7 @@ class ScannerActivity : AppCompatActivity() {
                         line.startsWith("Paid:") -> paid = line.removePrefix("Paid:").trim()
                     }
                 }
+                Log.e("SCANNER", "onActivityResult: "+ paid)
 
                 val intent = Intent(this, TicketOutActivity::class.java).apply {
                     putExtra("recpNo", recpNo)
@@ -52,7 +54,7 @@ class ScannerActivity : AppCompatActivity() {
                     putExtra("vehNo", vehNo)
                     putExtra("vehType", vehType)
                     putExtra("inTime", inTime)
-                    putExtra("paid", paid)
+                    putExtra("paid", paid.toInt())
                 }
                 startActivity(intent)
                 finish()

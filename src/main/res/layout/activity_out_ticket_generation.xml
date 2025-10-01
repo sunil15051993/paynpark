@@ -25,6 +25,7 @@
                     android:id="@+id/imageBack"
                     android:layout_width="35dp"
                     android:layout_height="35dp"
+                    android:layout_gravity="center"
                     android:src="@drawable/ic_left" />
 
                 <TextView
@@ -38,12 +39,13 @@
                     android:textSize="22sp"
                     android:textStyle="bold" />
 
-                <ImageView
-                    android:id="@+id/imageRefresh"
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
-                    android:padding="2dp"
-                    android:src="@mipmap/reload" />
+                <Button
+                    android:id="@+id/buttongetPrint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#0277BD"
+                    android:backgroundTint="@color/white"
+                    android:text="Print" />
 
             </LinearLayout>
 
@@ -331,18 +333,5 @@
                 android:textStyle="bold" />
 
         </LinearLayout>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/buttongetPrint"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:backgroundTint="#0277BD"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:text="Get Print"
-            android:textAllCaps="false"
-            android:textColor="@android:color/white"
-            app:cornerRadius="8dp" />
     </LinearLayout>
 </ScrollView>

@@ -146,6 +146,7 @@ public class InTicketGenerationActivity extends AppCompatActivity {
 
             // ---- Print Strings ----
             printerHelper.printText("" + binding.textHeader1.getText(), AlignStyle.PRINT_STYLE_CENTER);
+            printerHelper.printText("---------------------------------------", AlignStyle.PRINT_STYLE_CENTER);
             printerHelper.printText("Receipt No : " + binding.textTicketNo.getText(), AlignStyle.PRINT_STYLE_LEFT);
             printerHelper.printText("Date       : " + binding.textDate.getText(), AlignStyle.PRINT_STYLE_LEFT);
             printerHelper.printText("Vehicle No : " + binding.textVehicleNo.getText(), AlignStyle.PRINT_STYLE_LEFT);
@@ -158,13 +159,14 @@ public class InTicketGenerationActivity extends AppCompatActivity {
             binding.textQR.setDrawingCacheEnabled(true);
             Bitmap qrBitmap = Bitmap.createBitmap(binding.textQR.getDrawingCache());
             binding.textQR.setDrawingCacheEnabled(false);
-            printerHelper.printQRCode(qrBitmap);
+            printerHelper.printQRCode(qrBitmap, AlignStyle.PRINT_STYLE_CENTER);
+            printerHelper.printText("---------------------------------------", AlignStyle.PRINT_STYLE_CENTER);
 
             // ---- Footer ----
             if (binding.textFooter1.length() == 0) {
-                printerHelper.printFooter("**** Thank You Visit Again ****", "");
+                printerHelper.printFooter("**** Thank You Visit Again ****");
             } else {
-                printerHelper.printFooter(binding.textFooter1.getText().toString(), "");
+                printerHelper.printFooter(binding.textFooter1.getText().toString());
             }
 
             // ---- Finish Printing ----

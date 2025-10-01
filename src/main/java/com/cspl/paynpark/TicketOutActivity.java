@@ -65,9 +65,10 @@ public class TicketOutActivity extends AppCompatActivity {
         String vehNo = intent.getString("vehNo");
         String vehType = intent.getString("vehType");
         String inTime = intent.getString("inTime");
-        String paid = intent.getString("paid");
+        int paid = intent.getInt("paid",0);
+        Log.e("TICKET_OUT", "onCreate: "+ paid);
 
-        init(recpNo,date,vehNo,vehType,inTime, Integer.parseInt(paid));
+        init(recpNo,date,vehNo,vehType,inTime, paid);
     }
 
     public void init(String recpNo, String inDate, String vehNo, String vehType, String inTime, int paid){
@@ -162,7 +163,6 @@ public class TicketOutActivity extends AppCompatActivity {
 
                             totalPrice = (int) (diffHours * pricePerHour);
                             Log.e("fare_result", "Total: " + totalPrice);
-                            totalPrice = (int) diffHours * pricePerHour;
                             diffAmt = totalPrice - paid;
 
                             String totalHrs = diffHours + " hrs";

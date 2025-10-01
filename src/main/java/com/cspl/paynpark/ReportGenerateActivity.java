@@ -97,7 +97,7 @@ public class ReportGenerateActivity extends AppCompatActivity {
             }
         });
 
-        binding.buttonGenerate.setOnClickListener(new View.OnClickListener() {
+        binding.buttongetPrint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 printReport();
@@ -126,26 +126,28 @@ public class ReportGenerateActivity extends AppCompatActivity {
 
             // ---- Print Strings ----
             printerHelper.printText("" + binding.textHeader1.getText(), AlignStyle.PRINT_STYLE_CENTER);
-            String header = padRight("SrNo", 5) +
-                    padRight("Type", 15) +
-                    padRight("No", 5) +
+            printerHelper.printText("" + binding.textDaily.getText(), AlignStyle.PRINT_STYLE_CENTER);
+            printerHelper.printText("---------------------------------------", AlignStyle.PRINT_STYLE_CENTER);
+            String header =
+                    padRight("Type", 25) +
+                    padRight("No", 27) +
                     padRight("Amt", 8);
             printerHelper.printText(header, AlignStyle.PRINT_STYLE_LEFT);
-            printerHelper.printText("--------------------------------", AlignStyle.PRINT_STYLE_LEFT);
+
             // Data rows
             for (int i = 0; i < reportList.size(); i++) {
                 TicketReport report = reportList.get(i);
 
-                String row = padRight(String.valueOf(i+1), 5) +
-                        padRight(report.vehicleType, 15) +
-                        padRight(String.valueOf(report.count), 5) +
+                String row =
+                        padRight(report.vehicleType, 20) +
+                        padRight(String.valueOf(report.count), 20) +
                         padRight(String.valueOf(report.totalAmt), 8);
 
                 printerHelper.printText(row, AlignStyle.PRINT_STYLE_LEFT);
             }
-            printerHelper.printText("--------------------------------", AlignStyle.PRINT_STYLE_LEFT);
-            printerHelper.printText("Staff Name : " + binding.textUserName.getText(), AlignStyle.PRINT_STYLE_LEFT);
-            printerHelper.printText("Total Collection : " + binding.textTotalCol.getText(), AlignStyle.PRINT_STYLE_LEFT);
+            printerHelper.printText("---------------------------------------", AlignStyle.PRINT_STYLE_CENTER);
+            printerHelper.printText("" + binding.textUserName.getText(), AlignStyle.PRINT_STYLE_LEFT);
+            printerHelper.printText("" + binding.textTotalCol.getText(), AlignStyle.PRINT_STYLE_LEFT);
 
 
             // ---- Finish Printing ----

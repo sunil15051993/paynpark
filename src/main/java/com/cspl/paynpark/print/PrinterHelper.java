@@ -42,11 +42,13 @@ public class PrinterHelper {
     /**
      * Print a QR code bitmap
      */
-    public void printQRCode(Bitmap qrBitmap) {
+    public void printQRCode(Bitmap qrBitmap, int alignStyle) {
         if (qrBitmap == null) return;
         try {
-            int ret = printer.printBmp(qrBitmap);
-            if (ret != ErrCode.ERR_SUCCESS) {
+            int ret = printer.setAlignStyle(alignStyle);
+            if (ret == ErrCode.ERR_SUCCESS) {
+                printer.printBmp(qrBitmap);
+            }else {
                 Log.e("PrinterHelper", "printBmp QR failed err=0x" + ret);
             }
         } catch (Exception e) {
@@ -59,7 +61,7 @@ public class PrinterHelper {
     /**
      * Print footer message with custom Canvas (example)
      */
-    public void printFooter(String footerText1, String footerText2) {
+    public void printFooter(String footerText) {
         try {
             Bitmap bitmap = Bitmap.createBitmap(384, 400, Bitmap.Config.RGB_565);
             Canvas canvas = new Canvas(bitmap);
@@ -67,19 +69,18 @@ public class PrinterHelper {
 
             int curY = 40;
 
-            // Center align first line
-            int textWidth1 = getTextWidth(footerText1);
-            int startX1 = (384 - textWidth1) / 2;
-            canvas.drawText(footerText1, startX1, curY, paint);
+            // Split footer text by new lines
+            String[] lines = footerText.split("\n");
 
-            curY += 40;
+            for (String line : lines) {
+                if (line.trim().isEmpty()) continue; // skip empty lines
 
-            // Center align second line
-            int textWidth2 = getTextWidth(footerText2);
-            int startX2 = (384 - textWidth2) / 2;
-            canvas.drawText(footerText2, startX2, curY, paint);
+                int textWidth = getTextWidth(line);
+                int startX = (384 - textWidth) / 2; // center align
+                canvas.drawText(line, startX, curY, paint);
 
-            curY += 40;
+                curY += 40; // move down for next line
+            }
 
             Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, 384, curY);
             int ret = printer.printBmp(newBitmap);

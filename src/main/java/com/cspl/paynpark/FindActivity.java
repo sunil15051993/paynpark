@@ -92,6 +92,7 @@ public class FindActivity extends AppCompatActivity {
                             i.putExtra("vehNo", ticket.getVehicleNo());
                             i.putExtra("vehType", ticket.getVehicleType());
                             i.putExtra("inTime", ticket.getInTime());
+                            i.putExtra("paid", ticket.getAmount());
                             startActivity(i);
                             Log.e("FIND_ENTRY", "onClick: "+  "Vehicle: " + ticket.getVehicleNo() +
                                     "\nDate: " + ticket.getDate() +
