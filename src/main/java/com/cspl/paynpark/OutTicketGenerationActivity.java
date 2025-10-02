@@ -1,47 +1,23 @@
 package com.cspl.paynpark;
 
-import static java.lang.Math.ceil;
-
-import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.os.Bundle;
 
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-import com.cspl.paynpark.api.Api;
 import com.cspl.paynpark.databinding.ActivityOutTicketGenerationBinding;
 import com.cspl.paynpark.dbhelper.AppDatabase;
 import com.cspl.paynpark.model.HeaderFooter;
-import com.cspl.paynpark.model.VehicFare;
-import com.cspl.paynpark.model.VehicType;
 import com.cspl.paynpark.print.PrinterHelper;
 import com.ftpos.library.smartpos.errcode.ErrCode;
 import com.ftpos.library.smartpos.printer.AlignStyle;
-import com.ftpos.library.smartpos.printer.OnPrinterCallback;
 import com.ftpos.library.smartpos.printer.PrintStatus;
 import com.ftpos.library.smartpos.printer.Printer;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.concurrent.Executors;
 
 public class OutTicketGenerationActivity extends AppCompatActivity {
@@ -63,16 +39,18 @@ public class OutTicketGenerationActivity extends AppCompatActivity {
         String vehType = b.getString("vehicle_type", "");
         String outTime = b.getString("out_time", "");
         String totalHrs = b.getString("total_hrs", "");
+        String inTime = b.getString("in_time", "");
+        String serial = b.getString("s_n", "");
         int paid = b.getInt("paid", 0);
         int amt = b.getInt("amt", 0);
 
-        init(recpNo, date, vehNo, vehType, outTime, paid, amt, totalHrs);
+        init(recpNo, date, vehNo, vehType, outTime, inTime, paid, amt, totalHrs,serial);
 
         this.printer = MainActivity.printer;
         printerHelper = new PrinterHelper(printer);
     }
 
-    public void init(String recpNo, String date, String vehNo, String vehType, String outTime, int paid, int amt, String totalHrs) {
+    public void init(String recpNo, String date, String vehNo, String vehType, String outTime, String inTime, int paid, int amt, String totalHrs, String serial) {
         binding.imageBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -97,9 +75,11 @@ public class OutTicketGenerationActivity extends AppCompatActivity {
         binding.textVehicleNo.setText(vehNo);
         binding.textVehicleType.setText(vehType);
         binding.textOuttime.setText(outTime);
+        binding.textInTime.setText(inTime);
         binding.textPaid.setText(""+paid);
         binding.textAmount.setText(""+amt);
         binding.textTotalHrs.setText(totalHrs);
+        binding.textSerialNo.setText(serial);
 
         Executors.newSingleThreadExecutor().execute(() -> {
             HeaderFooter hf = db.headerFooterDao().getHeaderFooter();
@@ -143,17 +123,33 @@ public class OutTicketGenerationActivity extends AppCompatActivity {
                 return;
             }
 
+            String leftText = "Receipt No : " + binding.textTicketNo.getText().toString();
+            String rightText = "S/N : " + binding.textSerialNo.getText().toString();
+            String inDt = "IN TM: " + binding.textInTime.getText().toString();
+            String inTime = "OUT TM: " + binding.textOuttime.getText().toString();
+
+            int lineChars = 32;
+            int spaceCount = lineChars - leftText.length() - rightText.length();
+            if (spaceCount < 0) spaceCount = 0; // Prevent negative spaces
+            String spaces = new String(new char[spaceCount]).replace('\0', ' ');
+            String receiptLine = leftText + spaces + rightText;
+
+            int spaceCount2 = lineChars - inDt.length() - inTime.length();
+            if (spaceCount2 < 0) spaceCount2 = 0; // Prevent negative spaces
+            String spaces2 = new String(new char[spaceCount2]).replace('\0', ' ');
+            String dateLine = inDt + spaces2 + spaces2 + inTime;
+
             // ---- Print Strings ----
             printerHelper.printText(""+binding.textHeader1.getText(), AlignStyle.PRINT_STYLE_CENTER);
             printerHelper.printText("---------------------------------------", AlignStyle.PRINT_STYLE_CENTER);
-            printerHelper.printText("Receipt No : " + binding.textTicketNo.getText(), AlignStyle.PRINT_STYLE_LEFT);
+            printerHelper.printText(receiptLine, AlignStyle.PRINT_STYLE_LEFT);
             printerHelper.printText("Date       : " + binding.textDate.getText(), AlignStyle.PRINT_STYLE_LEFT);
-            printerHelper.printText("Vehicle No : " + binding.textVehicleNo.getText(), AlignStyle.PRINT_STYLE_LEFT);
+            printerHelper.printLargeText("Vehicle No : " + binding.textVehicleNo.getText().toString(), 30);
             printerHelper.printText("Vehicle Type : " + binding.textVehicleType.getText(), AlignStyle.PRINT_STYLE_LEFT);
-            printerHelper.printText("Out Time : " + binding.textOuttime.getText(), AlignStyle.PRINT_STYLE_LEFT);
+            printerHelper.printText(dateLine, AlignStyle.PRINT_STYLE_LEFT);
             printerHelper.printText("Total Hrs : " + binding.textTotalHrs.getText(), AlignStyle.PRINT_STYLE_LEFT);
             printerHelper.printText("Paid : " + binding.textPaid.getText(), AlignStyle.PRINT_STYLE_LEFT);
-            printerHelper.printText("Diff.amount : ₹" + binding.textAmount.getText(), AlignStyle.PRINT_STYLE_LEFT);
+            printerHelper.printLargeText("Diff.amount : ₹ " + binding.textAmount.getText(), 30);
             printerHelper.printText("---------------------------------------", AlignStyle.PRINT_STYLE_CENTER);
 
             // ---- Footer ----

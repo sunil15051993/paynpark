@@ -90,9 +90,9 @@
                     android:weightSum="3">
 
                     <TextView
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_weight="0"
                         android:fontFamily="sans-serif-medium"
                         android:text="Receipt No."
                         android:textSize="15sp" />
@@ -108,27 +108,19 @@
 
                     <TextView
                         android:id="@+id/textTicketNo"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_weight="0.5"
                         android:fontFamily="sans-serif-medium"
-                        android:text="PT001"
+                        android:text="0001"
                         android:textSize="15sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="horizontal"
-                    android:weightSum="3">
 
                     <TextView
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_weight="0"
                         android:fontFamily="sans-serif-medium"
-                        android:text="Date"
+                        android:text="S/N"
                         android:textSize="15sp" />
 
                     <TextView
@@ -141,12 +133,12 @@
                         android:textSize="15sp" />
 
                     <TextView
-                        android:id="@+id/textDate"
+                        android:id="@+id/textSerialNo"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:fontFamily="sans-serif-medium"
-                        android:text="00-00-0000"
+                        android:text="0000"
                         android:textSize="15sp" />
                 </LinearLayout>
 
@@ -181,7 +173,8 @@
                         android:layout_weight="1"
                         android:fontFamily="sans-serif-medium"
                         android:text="GJ05"
-                        android:textSize="15sp" />
+                        android:textStyle="bold"
+                        android:textSize="18sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -226,11 +219,36 @@
                     android:weightSum="3">
 
                     <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="IN Date"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.2"
+                        android:fontFamily="sans-serif-medium"
+                        android:gravity="center"
+                        android:text=":"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/textDate"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:fontFamily="sans-serif-medium"
-                        android:text="In Time"
+                        android:text="00-00-0000"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:layout_weight="0"
+                        android:text="IN Time"
                         android:textSize="15sp" />
 
                     <TextView
@@ -264,7 +282,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:fontFamily="sans-serif-medium"
-                        android:text="Amt. (per hr)"
+                        android:text="Amt. (per hr) ₹"
                         android:textSize="15sp" />
 
                     <TextView
@@ -282,14 +300,15 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:fontFamily="sans-serif-medium"
-                        android:text="0"
-                        android:textSize="15sp" />
+                        android:text="20"
+                        android:textStyle="bold"
+                        android:textSize="22sp" />
                 </LinearLayout>
 
                 <ImageView
                     android:id="@+id/textQR"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="6dp"
                     android:contentDescription="QR"
@@ -311,9 +330,6 @@
                     android:layout_height="wrap_content"
                     android:singleLine="false"
                     android:ellipsize="none"
-                    android:scrollHorizontally="false"
-                    android:inputType="textMultiLine"
-                    android:lines="4"
                     android:gravity="center" />
 
             </LinearLayout>

@@ -52,6 +52,7 @@ public class TicketInActivity extends AppCompatActivity {
     private ProgressDialog pdDialog;
     private SharedPreferences myPref;
     private AppDatabase db;
+    String serialNo, last4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +63,16 @@ public class TicketInActivity extends AppCompatActivity {
         myPref = getSharedPreferences("paynpark", MODE_PRIVATE);
         boolean call = myPref.getBoolean("api_vh_type", false);
         db = AppDatabase.getInstance(TicketInActivity.this);
+
+        try {
+            // get system serial
+            serialNo = android.os.Build.getSerial();
+            Log.e("POS_SN", "Serial Number: " + serialNo);
+            last4 = serialNo.substring(serialNo.length() - 4);
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            Log.e("POS_SN", "Permission required to read serial");
+        }
 
         init();
 
@@ -190,6 +201,7 @@ public class TicketInActivity extends AppCompatActivity {
                                 generate.putExtra("vehicle_type", vehicleType);
                                 generate.putExtra("in_time", inTime);
                                 generate.putExtra("amt_per_hr", amtPerHr);
+                                generate.putExtra("s_n", last4);
                                 startActivity(generate);
                                 finish();
 

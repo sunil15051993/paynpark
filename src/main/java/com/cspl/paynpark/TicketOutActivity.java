@@ -53,6 +53,7 @@ public class TicketOutActivity extends AppCompatActivity {
     private ProgressDialog pdDialog;
     private SharedPreferences myPref;
     private String totalHrs;
+    String serialNo, last4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +69,16 @@ public class TicketOutActivity extends AppCompatActivity {
         String inTime = intent.getString("inTime");
         int paid = intent.getInt("paid",0);
         Log.e("TICKET_OUT", "onCreate: "+ paid);
+
+        try {
+            // get system serial
+            serialNo = android.os.Build.getSerial();
+            Log.e("POS_SN", "Serial Number: " + serialNo);
+            last4 = serialNo.substring(serialNo.length() - 4);
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            Log.e("POS_SN", "Permission required to read serial");
+        }
 
         init(recpNo,date,vehNo,vehType,inTime, paid);
     }
@@ -185,9 +196,11 @@ public class TicketOutActivity extends AppCompatActivity {
                     generate.putExtra("vehicle_no", vehNo);
                     generate.putExtra("vehicle_type", vehType);
                     generate.putExtra("out_time", outTime);
+                    generate.putExtra("in_time", inTime);
                     generate.putExtra("paid", paid);
                     generate.putExtra("amt", diffAmt);
                     generate.putExtra("total_hrs", totalHrs);
+                    generate.putExtra("s_n", last4);
                     startActivity(generate);
 
                     Toast.makeText(TicketOutActivity.this, "Data Saved!", Toast.LENGTH_SHORT).show();

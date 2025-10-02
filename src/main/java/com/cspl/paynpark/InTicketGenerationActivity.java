@@ -1,13 +1,8 @@
 package com.cspl.paynpark;
 
-import static java.lang.Math.ceil;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -21,7 +16,6 @@ import com.cspl.paynpark.model.HeaderFooter;
 import com.cspl.paynpark.print.PrinterHelper;
 import com.ftpos.library.smartpos.errcode.ErrCode;
 import com.ftpos.library.smartpos.printer.AlignStyle;
-import com.ftpos.library.smartpos.printer.OnPrinterCallback;
 import com.ftpos.library.smartpos.printer.PrintStatus;
 import com.ftpos.library.smartpos.printer.Printer;
 import com.google.zxing.BarcodeFormat;
@@ -49,14 +43,15 @@ public class InTicketGenerationActivity extends AppCompatActivity {
         String vehNo = b.getString("vehicle_no", "");
         String vehType = b.getString("vehicle_type", "");
         String inTime = b.getString("in_time", "");
+        String serial = b.getString("s_n", "");
         int amtPerHr = b.getInt("amt_per_hr", 0);
 
-        init(recpNo, date, vehNo, vehType, inTime, amtPerHr);
+        init(recpNo, date, vehNo, vehType, inTime, amtPerHr, serial);
         this.printer = MainActivity.printer;
         printerHelper = new PrinterHelper(printer);
     }
 
-    public void init(String recpNo, String date, String vehNo, String vehType, String inTime, int amtPerHr) {
+    public void init(String recpNo, String date, String vehNo, String vehType, String inTime, int amtPerHr, String serial) {
         binding.imageBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -81,6 +76,7 @@ public class InTicketGenerationActivity extends AppCompatActivity {
         binding.textVehicleType.setText(vehType);
         binding.textIntime.setText(inTime);
         binding.textAmtPerHr.setText("" + amtPerHr);
+        binding.textSerialNo.setText(serial);
         Executors.newSingleThreadExecutor().execute(() -> {
             HeaderFooter hf = db.headerFooterDao().getHeaderFooter();
 
@@ -143,16 +139,30 @@ public class InTicketGenerationActivity extends AppCompatActivity {
                 Log.e("PRINT", "Printer out of paper");
                 return;
             }
+            String leftText = "Receipt No : " + binding.textTicketNo.getText().toString();
+            String rightText = "S/N : " + binding.textSerialNo.getText().toString();
+            String inDt = "IN DT: " + binding.textDate.getText().toString();
+            String inTime = "IN TM: " + binding.textIntime.getText().toString();
+
+            int lineChars = 32;
+            int spaceCount = lineChars - leftText.length() - rightText.length();
+            if (spaceCount < 0) spaceCount = 0; // Prevent negative spaces
+            String spaces = new String(new char[spaceCount]).replace('\0', ' ');
+            String receiptLine = leftText + spaces + rightText;
+
+            int spaceCount2 = lineChars - inDt.length() - inTime.length();
+            if (spaceCount2 < 0) spaceCount2 = 0; // Prevent negative spaces
+            String spaces2 = new String(new char[spaceCount2]).replace('\0', ' ');
+            String dateLine = inDt + spaces2 + spaces2 + inTime;
 
             // ---- Print Strings ----
             printerHelper.printText("" + binding.textHeader1.getText(), AlignStyle.PRINT_STYLE_CENTER);
             printerHelper.printText("---------------------------------------", AlignStyle.PRINT_STYLE_CENTER);
-            printerHelper.printText("Receipt No : " + binding.textTicketNo.getText(), AlignStyle.PRINT_STYLE_LEFT);
-            printerHelper.printText("Date       : " + binding.textDate.getText(), AlignStyle.PRINT_STYLE_LEFT);
-            printerHelper.printText("Vehicle No : " + binding.textVehicleNo.getText(), AlignStyle.PRINT_STYLE_LEFT);
+            printerHelper.printText(receiptLine, AlignStyle.PRINT_STYLE_LEFT);
+            printerHelper.printText(dateLine, AlignStyle.PRINT_STYLE_LEFT);
+            printerHelper.printLargeText("Vehicle No : " + binding.textVehicleNo.getText().toString(), 30);
             printerHelper.printText("Vehicle Type : " + binding.textVehicleType.getText(), AlignStyle.PRINT_STYLE_LEFT);
-            printerHelper.printText("In Time : " + binding.textIntime.getText(), AlignStyle.PRINT_STYLE_LEFT);
-            printerHelper.printText("Paid : " + binding.textAmtPerHr.getText(), AlignStyle.PRINT_STYLE_LEFT);
+            printerHelper.printLargeText("Paid ₹ : " + binding.textAmtPerHr.getText(), 30);
 
 
             // ---- Print QR Code ----

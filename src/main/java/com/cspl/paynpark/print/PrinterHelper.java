@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.util.Log;
 
 import com.ftpos.library.smartpos.errcode.ErrCode;
@@ -21,6 +22,32 @@ public class PrinterHelper {
         this.printer = printer;
         paint.setTextSize(24);
         paint.setColor(Color.BLACK);
+    }
+
+    public void printLargeText(String text, int fontSize) {
+        Paint paint = new Paint();
+        paint.setTextSize(fontSize);
+        paint.setColor(Color.BLACK);
+
+        // Bold text
+        paint.setTypeface(Typeface.DEFAULT_BOLD);
+        paint.setFakeBoldText(true);
+
+        // Calculate exact height
+        Paint.FontMetrics fontMetrics = paint.getFontMetrics();
+        int height = (int) (fontMetrics.bottom - fontMetrics.top);
+        int width = 360; // printer max width in pixels
+
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        canvas.drawColor(Color.WHITE);
+
+        // Draw text at baseline
+        canvas.drawText(text, 0, -fontMetrics.top, paint);
+
+        printer.printBmp(bitmap);
+        printer.feed(10);
+        bitmap.recycle();
     }
 
     /**
@@ -79,7 +106,7 @@ public class PrinterHelper {
                 int startX = (384 - textWidth) / 2; // center align
                 canvas.drawText(line, startX, curY, paint);
 
-                curY += 40; // move down for next line
+                curY += paint.getTextSize();   // Use text size as baseline spacing (no extra gap)
             }
 
             Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, 384, curY);

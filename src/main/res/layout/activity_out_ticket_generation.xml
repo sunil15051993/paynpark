@@ -79,9 +79,9 @@
                 android:weightSum="3">
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_weight="0"
                     android:fontFamily="sans-serif-medium"
                     android:text="Receipt No."
                     android:textSize="15sp" />
@@ -97,11 +97,37 @@
 
                 <TextView
                     android:id="@+id/textTicketNo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="0001"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="S/N"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.2"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="center"
+                    android:text=":"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/textSerialNo"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:fontFamily="sans-serif-medium"
-                    android:text="PT001"
+                    android:text="0000"
                     android:textSize="15sp" />
             </LinearLayout>
 
@@ -215,10 +241,35 @@
                 android:weightSum="3">
 
                 <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="IN Time"
+                    android:textSize="15sp" />
+
+                <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_weight="0.2"
                     android:fontFamily="sans-serif-medium"
+                    android:gravity="center"
+                    android:text=":"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/textInTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.3"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="00:00"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_weight="0"
                     android:text="Out Time"
                     android:textSize="15sp" />
 
