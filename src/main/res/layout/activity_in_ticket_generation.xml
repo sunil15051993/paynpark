@@ -94,7 +94,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="0"
                         android:fontFamily="sans-serif-medium"
-                        android:text="Receipt No."
+                        android:text="Bill No."
                         android:textSize="15sp" />
 
                     <TextView
@@ -154,7 +154,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:fontFamily="sans-serif-medium"
-                        android:text="Vehicle No."
+                        android:text="IN DT"
                         android:textSize="15sp" />
 
                     <TextView
@@ -167,14 +167,47 @@
                         android:textSize="15sp" />
 
                     <TextView
-                        android:id="@+id/textVehicleNo"
+                        android:id="@+id/textDate"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:fontFamily="sans-serif-medium"
-                        android:text="GJ05"
-                        android:textStyle="bold"
-                        android:textSize="18sp" />
+                        android:text="00-00-0000"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:weightSum="3">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="IN TM"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.2"
+                        android:fontFamily="sans-serif-medium"
+                        android:gravity="center"
+                        android:text=":"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/textIntime"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="00-00-0000"
+                        android:textSize="15sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -219,10 +252,11 @@
                     android:weightSum="3">
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:fontFamily="sans-serif-medium"
-                        android:text="IN Date"
+                        android:text="Vehicle No."
                         android:textSize="15sp" />
 
                     <TextView
@@ -235,39 +269,14 @@
                         android:textSize="15sp" />
 
                     <TextView
-                        android:id="@+id/textDate"
+                        android:id="@+id/textVehicleNo"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:fontFamily="sans-serif-medium"
-                        android:text="00-00-0000"
-                        android:textSize="15sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-medium"
-                        android:layout_weight="0"
-                        android:text="IN Time"
-                        android:textSize="15sp" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="0.2"
-                        android:fontFamily="sans-serif-medium"
-                        android:gravity="center"
-                        android:text=":"
-                        android:textSize="15sp" />
-
-                    <TextView
-                        android:id="@+id/textIntime"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:fontFamily="sans-serif-medium"
-                        android:text="00:00"
-                        android:textSize="15sp" />
+                        android:text="GJ05"
+                        android:textStyle="bold"
+                        android:textSize="18sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -312,8 +321,6 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="6dp"
                     android:contentDescription="QR"
-                    android:fontFamily="monospace"
-                    android:gravity="center"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 

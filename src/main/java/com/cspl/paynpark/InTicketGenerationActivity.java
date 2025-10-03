@@ -3,6 +3,7 @@ package com.cspl.paynpark;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -23,12 +24,17 @@ import com.journeyapps.barcodescanner.BarcodeEncoder;
 import com.google.zxing.WriterException;
 import com.google.zxing.qrcode.QRCodeWriter;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.Executors;
 
 public class InTicketGenerationActivity extends AppCompatActivity {
     private ActivityInTicketGenerationBinding binding;
     private Printer printer;
     private PrinterHelper printerHelper;
+    String outTime = "";
 
 
     @Override
@@ -51,7 +57,21 @@ public class InTicketGenerationActivity extends AppCompatActivity {
         printerHelper = new PrinterHelper(printer);
     }
 
-    public void init(String recpNo, String date, String vehNo, String vehType, String inTime, int amtPerHr, String serial) {
+    public void init(String recpNo, String inDate, String vehNo, String vehType, String inTime, int amtPerHr, String serial) {
+        try {
+            // Parse 12-hour format
+            SimpleDateFormat inputFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+            Date date = inputFormat.parse(inTime);
+
+            // Convert to 24-hour format
+            SimpleDateFormat outputFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+            outTime = outputFormat.format(date);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        Log.e("ConvertedTime", "24hr Format: " + outTime);
         binding.imageBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -71,10 +91,10 @@ public class InTicketGenerationActivity extends AppCompatActivity {
         AppDatabase db = AppDatabase.getInstance(InTicketGenerationActivity.this);
 
         binding.textTicketNo.setText(recpNo);
-        binding.textDate.setText(date);
+        binding.textDate.setText(inDate);
         binding.textVehicleNo.setText(vehNo);
         binding.textVehicleType.setText(vehType);
-        binding.textIntime.setText(inTime);
+        binding.textIntime.setText(outTime);
         binding.textAmtPerHr.setText("" + amtPerHr);
         binding.textSerialNo.setText(serial);
         Executors.newSingleThreadExecutor().execute(() -> {
@@ -94,7 +114,7 @@ public class InTicketGenerationActivity extends AppCompatActivity {
 
         // Combine into one string
         String qrData = "Receipt No: " + recpNo + "\n"
-                + "Date: " + date + "\n"
+                + "Date: " + inDate + "\n"
                 + "Vehicle No: " + vehNo + "\n"
                 + "Vehicle Type: " + vehType + "\n"
                 + "In Time: " + inTime + "\n"
@@ -139,7 +159,7 @@ public class InTicketGenerationActivity extends AppCompatActivity {
                 Log.e("PRINT", "Printer out of paper");
                 return;
             }
-            String leftText = "Receipt No : " + binding.textTicketNo.getText().toString();
+            String leftText = "Bill No : " + binding.textTicketNo.getText().toString();
             String rightText = "S/N : " + binding.textSerialNo.getText().toString();
             String inDt = "IN DT: " + binding.textDate.getText().toString();
             String inTime = "IN TM: " + binding.textIntime.getText().toString();
@@ -152,25 +172,25 @@ public class InTicketGenerationActivity extends AppCompatActivity {
 
             int spaceCount2 = lineChars - inDt.length() - inTime.length();
             if (spaceCount2 < 0) spaceCount2 = 0; // Prevent negative spaces
-            String spaces2 = new String(new char[spaceCount2]).replace('\0', ' ');
+            String spaces2 = new String(new char[spaceCount2]).replace('\00', ' ');
             String dateLine = inDt + spaces2 + spaces2 + inTime;
 
             // ---- Print Strings ----
             printerHelper.printText("" + binding.textHeader1.getText(), AlignStyle.PRINT_STYLE_CENTER);
-            printerHelper.printText("---------------------------------------", AlignStyle.PRINT_STYLE_CENTER);
+            printerHelper.printText("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", AlignStyle.PRINT_STYLE_CENTER);
             printerHelper.printText(receiptLine, AlignStyle.PRINT_STYLE_LEFT);
             printerHelper.printText(dateLine, AlignStyle.PRINT_STYLE_LEFT);
-            printerHelper.printLargeText("Vehicle No : " + binding.textVehicleNo.getText().toString(), 30);
             printerHelper.printText("Vehicle Type : " + binding.textVehicleType.getText(), AlignStyle.PRINT_STYLE_LEFT);
-            printerHelper.printLargeText("Paid ₹ : " + binding.textAmtPerHr.getText(), 30);
+            printerHelper.printLargeText("Vehicle No : " + binding.textVehicleNo.getText().toString(), 30, Paint.Align.CENTER);
+            printerHelper.printLargeText("₹ : " + binding.textAmtPerHr.getText(), 30, Paint.Align.CENTER);
 
 
             // ---- Print QR Code ----
             binding.textQR.setDrawingCacheEnabled(true);
             Bitmap qrBitmap = Bitmap.createBitmap(binding.textQR.getDrawingCache());
             binding.textQR.setDrawingCacheEnabled(false);
-            printerHelper.printQRCode(qrBitmap, AlignStyle.PRINT_STYLE_CENTER);
-            printerHelper.printText("---------------------------------------", AlignStyle.PRINT_STYLE_CENTER);
+            printerHelper.printQRCode(qrBitmap, AlignStyle.PRINT_STYLE_CENTER,200);
+            printerHelper.printText("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", AlignStyle.PRINT_STYLE_CENTER);
 
             // ---- Footer ----
             if (binding.textFooter1.length() == 0) {

@@ -57,24 +57,13 @@
             android:padding="12dp">
 
             <TextView
-                android:id="@+id/textHeader1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:fontFamily="monospace"
-                android:gravity="center"
-                android:text="PAY &amp; PARK"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <TextView
                 android:id="@+id/textDaily"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
                 android:fontFamily="sans-serif-light"
                 android:gravity="center"
-                android:text="Day Report"
+                android:text="VEHICLE WISE REPORT"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -86,31 +75,49 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/textUserName"
+                android:id="@+id/textHeader1"
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:fontFamily="monospace"
+                android:gravity="center"
+                android:text="PAY &amp; PARK"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="------------------------------------------------------------"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textUserName"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="UserName"
                 android:textStyle="bold"
+                android:layout_marginStart="10dp"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/textEmployeeId"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Employee Id"
+                android:layout_marginStart="10dp"
                 android:textStyle="bold"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
 
             <TextView
-                android:id="@+id/textTotalCol"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Total Collection"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:textSize="16sp" />
+                android:gravity="center"
+                android:text="------------------------------------------------------------"
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -142,77 +149,126 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
-                    android:orientation="vertical">
+                    android:orientation="horizontal"
+                    android:padding="10dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <!-- Vehicle Type -->
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Vehicle Type"
-                        android:textSize="14sp"
-                        android:textColor="@color/black"
-                        android:textStyle="bold"/>
+                        android:layout_weight="1.5"
+                        android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/textVehicleType"
-                        android:layout_width="wrap_content"
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Vehicle Type"
+                            android:textSize="14sp"
+                            android:textColor="@color/black"
+                            android:textStyle="bold"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="---------------"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/textVehicleType"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Two wheeler"
+                            android:textSize="14sp"
+                            android:layout_marginTop="10dp"/>
+                    </LinearLayout>
+
+                    <!-- No. of Vehicle -->
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="2 wheeler"
-                        android:textSize="14sp"
-                        android:layout_marginTop="10dp"/>
-                </LinearLayout>
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
-                    android:orientation="vertical">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Qty"
+                            android:textSize="14sp"
+                            android:layout_gravity="center"
+                            android:textColor="@color/black"
+                            android:textStyle="bold"/>
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="---------------"
+                            android:layout_gravity="center"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/textNo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="2"
+                            android:layout_gravity="center"
+                            android:textSize="14sp"
+                            android:layout_marginTop="10dp"/>
+                    </LinearLayout>
+
+                    <!-- Total Amount -->
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="No. of Vhicle"
-                        android:textSize="14sp"
-                        android:textColor="@color/black"
-                        android:textStyle="bold"/>
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/textNo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="2"
-                        android:layout_gravity="center"
-                        android:textSize="14sp"
-                        android:layout_marginTop="10dp"/>
-                </LinearLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Amount."
+                            android:layout_gravity="center"
+                            android:textSize="14sp"
+                            android:textColor="@color/black"
+                            android:textStyle="bold"/>
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="20sp"
-                    android:orientation="vertical">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="---------------"
+                            android:layout_gravity="center"
+                            android:textStyle="bold" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Total Amt."
-                        android:textSize="14sp"
-                        android:textColor="@color/black"
-                        android:textStyle="bold"/>
+                        <TextView
+                            android:id="@+id/textAmt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="100"
+                            android:layout_gravity="center"
+                            android:textSize="14sp"
+                            android:layout_marginTop="10dp"/>
+                    </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/textAmt"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="100"
-                        android:layout_gravity="center"
-                        android:textSize="14sp"
-                        android:layout_marginTop="10dp"/>
                 </LinearLayout>
 
             </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="------------------------------------------------------------"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/textTotalCol"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Total Collection"
+                android:layout_marginStart="10dp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

@@ -200,6 +200,7 @@ public class TicketOutActivity extends AppCompatActivity {
                     generate.putExtra("paid", paid);
                     generate.putExtra("amt", diffAmt);
                     generate.putExtra("total_hrs", totalHrs);
+                    generate.putExtra("total_amt", totalPrice);
                     generate.putExtra("s_n", last4);
                     startActivity(generate);
 

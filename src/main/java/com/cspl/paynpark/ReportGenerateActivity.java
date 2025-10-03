@@ -1,5 +1,6 @@
 package com.cspl.paynpark;
 
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -78,8 +79,8 @@ public class ReportGenerateActivity extends AppCompatActivity {
                 binding.textVehicleType.setText(vehicleTypes.toString());
                 binding.textNo.setText(noOfTickets.toString());
                 binding.textAmt.setText(totalAmts.toString());
-                binding.textUserName.setText("Staff name: " + emp);
-                binding.textTotalCol.setText("Total Collection: " + String.valueOf(grandTotal));
+                binding.textUserName.setText("Staff ID: " + emp);
+                binding.textTotalCol.setText("Total ₹: " + String.valueOf(grandTotal));
             });
         });
 
@@ -125,29 +126,34 @@ public class ReportGenerateActivity extends AppCompatActivity {
             }
 
             // ---- Print Strings ----
+            printerHelper.printText("" + binding.textDaily.getText(),AlignStyle.PRINT_STYLE_CENTER);
+            printerHelper.printText("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", AlignStyle.PRINT_STYLE_CENTER);
             printerHelper.printText("" + binding.textHeader1.getText(), AlignStyle.PRINT_STYLE_CENTER);
-            printerHelper.printText("" + binding.textDaily.getText(), AlignStyle.PRINT_STYLE_CENTER);
-            printerHelper.printText("---------------------------------------", AlignStyle.PRINT_STYLE_CENTER);
-            String header =
-                    padRight("Type", 25) +
-                    padRight("No", 27) +
-                    padRight("Amt", 8);
+            printerHelper.printText("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", AlignStyle.PRINT_STYLE_CENTER);
+            printerHelper.printText(binding.textUserName.getText().toString(), AlignStyle.PRINT_STYLE_LEFT);
+            printerHelper.printText("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", AlignStyle.PRINT_STYLE_CENTER);
+
+            // Print Column Titles (adjusted for 58mm paper)
+            final int TYPE_WIDTH = 18;
+            final int QTY_WIDTH = 6;
+            final int AMT_WIDTH = 8;
+            String header = padRight("Type", TYPE_WIDTH) +
+                    padRight(padLeft("Qty", QTY_WIDTH), QTY_WIDTH) +
+                    padLeft("Amount", AMT_WIDTH); // Right align 'Amount' title
             printerHelper.printText(header, AlignStyle.PRINT_STYLE_LEFT);
+            printerHelper.printText("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", AlignStyle.PRINT_STYLE_CENTER);
 
-            // Data rows
-            for (int i = 0; i < reportList.size(); i++) {
-                TicketReport report = reportList.get(i);
-
-                String row =
-                        padRight(report.vehicleType, 20) +
-                        padRight(String.valueOf(report.count), 20) +
-                        padRight(String.valueOf(report.totalAmt), 8);
-
+            // Print Data Rows
+            for (TicketReport report : reportList) {
+                String row = padRight(report.vehicleType, TYPE_WIDTH) +
+                        // Right-align Qty
+                        padLeft(String.valueOf(report.count), QTY_WIDTH) +
+                        // Right-align Amount
+                        padLeft(String.valueOf(report.totalAmt), AMT_WIDTH);
                 printerHelper.printText(row, AlignStyle.PRINT_STYLE_LEFT);
             }
-            printerHelper.printText("---------------------------------------", AlignStyle.PRINT_STYLE_CENTER);
-            printerHelper.printText("" + binding.textUserName.getText(), AlignStyle.PRINT_STYLE_LEFT);
-            printerHelper.printText("" + binding.textTotalCol.getText(), AlignStyle.PRINT_STYLE_LEFT);
+            printerHelper.printText("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", AlignStyle.PRINT_STYLE_CENTER);
+            printerHelper.printLargeText("" + binding.textTotalCol.getText().toString(), 25, Paint.Align.CENTER);
 
 
             // ---- Finish Printing ----

@@ -24,29 +24,40 @@ public class PrinterHelper {
         paint.setColor(Color.BLACK);
     }
 
-    public void printLargeText(String text, int fontSize) {
+    public void printLargeText(String text, int fontSize, Paint.Align align) {
         Paint paint = new Paint();
         paint.setTextSize(fontSize);
         paint.setColor(Color.BLACK);
 
         // Bold text
-        paint.setTypeface(Typeface.DEFAULT_BOLD);
+        paint.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
         paint.setFakeBoldText(true);
 
-        // Calculate exact height
+        // Alignment setting
+        paint.setTextAlign(align);
+
+        // Calculate height
         Paint.FontMetrics fontMetrics = paint.getFontMetrics();
         int height = (int) (fontMetrics.bottom - fontMetrics.top);
-        int width = 360; // printer max width in pixels
+        int width = 360; // printer max width in pixels (58mm paper)
 
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         canvas.drawColor(Color.WHITE);
 
+        float x;
+        if (align == Paint.Align.LEFT) {
+            x = 0; // start left
+        } else if (align == Paint.Align.CENTER) {
+            x = width / 2f; // middle of page
+        } else { // RIGHT
+            x = width; // end of page
+        }
+
         // Draw text at baseline
-        canvas.drawText(text, 0, -fontMetrics.top, paint);
+        canvas.drawText(text, x, -fontMetrics.top, paint);
 
         printer.printBmp(bitmap);
-        printer.feed(10);
         bitmap.recycle();
     }
 
@@ -69,15 +80,20 @@ public class PrinterHelper {
     /**
      * Print a QR code bitmap
      */
-    public void printQRCode(Bitmap qrBitmap, int alignStyle) {
+    public void printQRCode(Bitmap qrBitmap, int alignStyle, int targetSizePx) {
         if (qrBitmap == null) return;
         try {
+            // Resize QR bitmap to desired size
+            Bitmap scaledBitmap = Bitmap.createScaledBitmap(qrBitmap, targetSizePx, targetSizePx, true);
+
             int ret = printer.setAlignStyle(alignStyle);
             if (ret == ErrCode.ERR_SUCCESS) {
-                printer.printBmp(qrBitmap);
-            }else {
+                printer.printBmp(scaledBitmap);
+            } else {
                 Log.e("PrinterHelper", "printBmp QR failed err=0x" + ret);
             }
+
+            scaledBitmap.recycle();
         } catch (Exception e) {
             Log.e("PrinterHelper", "printQRCode Exception: " + e.getMessage());
         } finally {
@@ -140,7 +156,7 @@ public class PrinterHelper {
         printer.print(new OnPrinterCallback() {
             @Override
             public void onSuccess() {
-                printer.feed(32);
+                printer.feed(28);
                 Log.e("PrinterHelper", "Print Success");
             }
 

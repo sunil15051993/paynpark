@@ -1,6 +1,7 @@
 package com.cspl.paynpark;
 
 import android.content.Intent;
+import android.graphics.Paint;
 import android.os.Bundle;
 
 import android.util.Log;
@@ -18,12 +19,18 @@ import com.ftpos.library.smartpos.printer.AlignStyle;
 import com.ftpos.library.smartpos.printer.PrintStatus;
 import com.ftpos.library.smartpos.printer.Printer;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.Executors;
 
 public class OutTicketGenerationActivity extends AppCompatActivity {
     private ActivityOutTicketGenerationBinding binding;
     private Printer printer;
     private PrinterHelper printerHelper;
+    String outTime = "";
+    String inTime = "";
 
 
     @Override
@@ -39,18 +46,38 @@ public class OutTicketGenerationActivity extends AppCompatActivity {
         String vehType = b.getString("vehicle_type", "");
         String outTime = b.getString("out_time", "");
         String totalHrs = b.getString("total_hrs", "");
+        String totalAmt = b.getString("total_amt", "");
         String inTime = b.getString("in_time", "");
         String serial = b.getString("s_n", "");
         int paid = b.getInt("paid", 0);
         int amt = b.getInt("amt", 0);
 
-        init(recpNo, date, vehNo, vehType, outTime, inTime, paid, amt, totalHrs,serial);
+        init(recpNo, date, vehNo, vehType, outTime, inTime, paid, amt, totalHrs,totalAmt,serial);
 
         this.printer = MainActivity.printer;
         printerHelper = new PrinterHelper(printer);
     }
 
-    public void init(String recpNo, String date, String vehNo, String vehType, String outTime, String inTime, int paid, int amt, String totalHrs, String serial) {
+    public void init(String recpNo, String outDate, String vehNo, String vehType, String out, String in, int paid, int amt, String totalHrs, String totalAmt, String serial) {
+        try {
+
+            SimpleDateFormat inputFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+
+            Date dateIn = inputFormat.parse(in);
+            Date dateOut = inputFormat.parse(out);
+
+            SimpleDateFormat outputFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+
+            String inTime = outputFormat.format(dateIn);
+            String outTime = outputFormat.format(dateOut);
+
+            binding.textInTime.setText(inTime);
+            binding.textOuttime.setText(outTime);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        Log.e("ConvertedTime", "24hr Format: " + outTime);
         binding.imageBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -71,11 +98,9 @@ public class OutTicketGenerationActivity extends AppCompatActivity {
         AppDatabase db = AppDatabase.getInstance(OutTicketGenerationActivity.this);
 
         binding.textTicketNo.setText(recpNo);
-        binding.textDate.setText(date);
+        binding.textDate.setText(outDate);
         binding.textVehicleNo.setText(vehNo);
         binding.textVehicleType.setText(vehType);
-        binding.textOuttime.setText(outTime);
-        binding.textInTime.setText(inTime);
         binding.textPaid.setText(""+paid);
         binding.textAmount.setText(""+amt);
         binding.textTotalHrs.setText(totalHrs);
@@ -115,6 +140,7 @@ public class OutTicketGenerationActivity extends AppCompatActivity {
             printer.startCaching();
             printer.setGray(3);
 
+
             PrintStatus status = new PrintStatus();
             printer.getStatus(status);
 
@@ -123,10 +149,10 @@ public class OutTicketGenerationActivity extends AppCompatActivity {
                 return;
             }
 
-            String leftText = "Receipt No : " + binding.textTicketNo.getText().toString();
+            String leftText = "Bill No : " + binding.textTicketNo.getText().toString();
             String rightText = "S/N : " + binding.textSerialNo.getText().toString();
             String inDt = "IN TM: " + binding.textInTime.getText().toString();
-            String inTime = "OUT TM: " + binding.textOuttime.getText().toString();
+            String inTime = "OT TM: " + binding.textOuttime.getText().toString();
 
             int lineChars = 32;
             int spaceCount = lineChars - leftText.length() - rightText.length();
@@ -141,16 +167,16 @@ public class OutTicketGenerationActivity extends AppCompatActivity {
 
             // ---- Print Strings ----
             printerHelper.printText(""+binding.textHeader1.getText(), AlignStyle.PRINT_STYLE_CENTER);
-            printerHelper.printText("---------------------------------------", AlignStyle.PRINT_STYLE_CENTER);
+            printerHelper.printText("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", AlignStyle.PRINT_STYLE_CENTER);
             printerHelper.printText(receiptLine, AlignStyle.PRINT_STYLE_LEFT);
             printerHelper.printText("Date       : " + binding.textDate.getText(), AlignStyle.PRINT_STYLE_LEFT);
-            printerHelper.printLargeText("Vehicle No : " + binding.textVehicleNo.getText().toString(), 30);
-            printerHelper.printText("Vehicle Type : " + binding.textVehicleType.getText(), AlignStyle.PRINT_STYLE_LEFT);
             printerHelper.printText(dateLine, AlignStyle.PRINT_STYLE_LEFT);
+            printerHelper.printText("Vehicle Type : " + binding.textVehicleType.getText(), AlignStyle.PRINT_STYLE_LEFT);
+            printerHelper.printLargeText("Vehicle No : " + binding.textVehicleNo.getText().toString(), 30, Paint.Align.CENTER);
             printerHelper.printText("Total Hrs : " + binding.textTotalHrs.getText(), AlignStyle.PRINT_STYLE_LEFT);
             printerHelper.printText("Paid : " + binding.textPaid.getText(), AlignStyle.PRINT_STYLE_LEFT);
-            printerHelper.printLargeText("Diff.amount : ₹ " + binding.textAmount.getText(), 30);
-            printerHelper.printText("---------------------------------------", AlignStyle.PRINT_STYLE_CENTER);
+            printerHelper.printLargeText("Diff.amount : ₹ " + binding.textAmount.getText(), 30, Paint.Align.CENTER);
+            printerHelper.printText("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", AlignStyle.PRINT_STYLE_CENTER);
 
             // ---- Footer ----
             if(binding.textFooter1.length() == 0) {
