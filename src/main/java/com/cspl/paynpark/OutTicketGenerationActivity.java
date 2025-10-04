@@ -46,11 +46,11 @@ public class OutTicketGenerationActivity extends AppCompatActivity {
         String vehType = b.getString("vehicle_type", "");
         String outTime = b.getString("out_time", "");
         String totalHrs = b.getString("total_hrs", "");
-        String totalAmt = b.getString("total_amt", "");
         String inTime = b.getString("in_time", "");
         String serial = b.getString("s_n", "");
         int paid = b.getInt("paid", 0);
         int amt = b.getInt("amt", 0);
+        int totalAmt = b.getInt("total_amt", 0);
 
         init(recpNo, date, vehNo, vehType, outTime, inTime, paid, amt, totalHrs,totalAmt,serial);
 
@@ -58,7 +58,7 @@ public class OutTicketGenerationActivity extends AppCompatActivity {
         printerHelper = new PrinterHelper(printer);
     }
 
-    public void init(String recpNo, String outDate, String vehNo, String vehType, String out, String in, int paid, int amt, String totalHrs, String totalAmt, String serial) {
+    public void init(String recpNo, String outDate, String vehNo, String vehType, String out, String in, int paid, int amt, String totalHrs, int totalAmt, String serial) {
         try {
 
             SimpleDateFormat inputFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
@@ -103,6 +103,7 @@ public class OutTicketGenerationActivity extends AppCompatActivity {
         binding.textVehicleType.setText(vehType);
         binding.textPaid.setText(""+paid);
         binding.textAmount.setText(""+amt);
+        binding.textTotalAmt.setText(""+totalAmt);
         binding.textTotalHrs.setText(totalHrs);
         binding.textSerialNo.setText(serial);
 
@@ -153,6 +154,8 @@ public class OutTicketGenerationActivity extends AppCompatActivity {
             String rightText = "S/N : " + binding.textSerialNo.getText().toString();
             String inDt = "IN TM: " + binding.textInTime.getText().toString();
             String inTime = "OT TM: " + binding.textOuttime.getText().toString();
+            String totalHrs = "Total Hrs: " + binding.textTotalHrs.getText().toString();
+            String totalAmt = "Total Amt: " + binding.textTotalAmt.getText().toString();
 
             int lineChars = 32;
             int spaceCount = lineChars - leftText.length() - rightText.length();
@@ -165,16 +168,21 @@ public class OutTicketGenerationActivity extends AppCompatActivity {
             String spaces2 = new String(new char[spaceCount2]).replace('\0', ' ');
             String dateLine = inDt + spaces2 + spaces2 + inTime;
 
+            int spaceCount3 = lineChars - totalHrs.length() - totalAmt.length();
+            if (spaceCount3 < 0) spaceCount3 = 0; // Prevent negative spaces
+            String spaces3 = new String(new char[spaceCount3]).replace('\0', ' ');
+            String totalLine = totalHrs + spaces3 + totalAmt;
+
             // ---- Print Strings ----
             printerHelper.printText(""+binding.textHeader1.getText(), AlignStyle.PRINT_STYLE_CENTER);
             printerHelper.printText("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", AlignStyle.PRINT_STYLE_CENTER);
             printerHelper.printText(receiptLine, AlignStyle.PRINT_STYLE_LEFT);
-            printerHelper.printText("Date       : " + binding.textDate.getText(), AlignStyle.PRINT_STYLE_LEFT);
+            printerHelper.printText("Out Date : " + binding.textDate.getText(), AlignStyle.PRINT_STYLE_LEFT);
             printerHelper.printText(dateLine, AlignStyle.PRINT_STYLE_LEFT);
             printerHelper.printText("Vehicle Type : " + binding.textVehicleType.getText(), AlignStyle.PRINT_STYLE_LEFT);
             printerHelper.printLargeText("Vehicle No : " + binding.textVehicleNo.getText().toString(), 30, Paint.Align.CENTER);
-            printerHelper.printText("Total Hrs : " + binding.textTotalHrs.getText(), AlignStyle.PRINT_STYLE_LEFT);
-            printerHelper.printText("Paid : " + binding.textPaid.getText(), AlignStyle.PRINT_STYLE_LEFT);
+            printerHelper.printText(totalLine, AlignStyle.PRINT_STYLE_LEFT);
+            printerHelper.printText("Paid : " + binding.textPaid.getText(), AlignStyle.PRINT_STYLE_CENTER);
             printerHelper.printLargeText("Diff.amount : ₹ " + binding.textAmount.getText(), 30, Paint.Align.CENTER);
             printerHelper.printText("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", AlignStyle.PRINT_STYLE_CENTER);
 

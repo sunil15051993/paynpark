@@ -17,8 +17,11 @@ import com.ftpos.library.smartpos.printer.AlignStyle;
 import com.ftpos.library.smartpos.printer.PrintStatus;
 import com.ftpos.library.smartpos.printer.Printer;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Executors;
 
 public class ReportGenerateActivity extends AppCompatActivity {
@@ -54,6 +57,16 @@ public class ReportGenerateActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
+        // Get current date & time
+        Date now = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        String currentDate = dateFormat.format(now);
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        String currentTime = timeFormat.format(now);
+
+        binding.textDate.setText(currentDate);
+        binding.textTime.setText(currentTime);
+
         AppDatabase db = AppDatabase.getInstance(ReportGenerateActivity.this);
         Executors.newSingleThreadExecutor().execute(() -> {
             reportList = db.ticketDao().getReportByDate(date,emp);
@@ -80,7 +93,7 @@ public class ReportGenerateActivity extends AppCompatActivity {
                 binding.textNo.setText(noOfTickets.toString());
                 binding.textAmt.setText(totalAmts.toString());
                 binding.textUserName.setText("Staff ID: " + emp);
-                binding.textTotalCol.setText("Total ₹: " + String.valueOf(grandTotal));
+                binding.textTotalCol.setText(String.valueOf(grandTotal));
             });
         });
 
@@ -119,42 +132,50 @@ public class ReportGenerateActivity extends AppCompatActivity {
 
             PrintStatus status = new PrintStatus();
             printer.getStatus(status);
-
             if (!status.getmIsHavePaper()) {
                 Log.e("PRINT", "Printer out of paper");
                 return;
             }
 
+            String leftText = "DT : " + binding.textDate.getText().toString();
+            String rightText = "TM : " + binding.textTime.getText().toString();
+
+            int lineChars = 32;
+            int spaceCount = lineChars - leftText.length() - rightText.length();
+            if (spaceCount < 0) spaceCount = 0; // Prevent negative spaces
+            String spaces = new String(new char[spaceCount]).replace('\0', ' ');
+            String receiptLine = leftText + spaces + rightText;
+
             // ---- Print Strings ----
-            printerHelper.printText("" + binding.textDaily.getText(),AlignStyle.PRINT_STYLE_CENTER);
+            printerHelper.printLargeText("VEHICLE WISE REPORT", 25, Paint.Align.CENTER);
             printerHelper.printText("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", AlignStyle.PRINT_STYLE_CENTER);
             printerHelper.printText("" + binding.textHeader1.getText(), AlignStyle.PRINT_STYLE_CENTER);
+            printerHelper.printText(receiptLine, AlignStyle.PRINT_STYLE_CENTER);
             printerHelper.printText("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", AlignStyle.PRINT_STYLE_CENTER);
             printerHelper.printText(binding.textUserName.getText().toString(), AlignStyle.PRINT_STYLE_LEFT);
-            printerHelper.printText("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", AlignStyle.PRINT_STYLE_CENTER);
+            List<String[]> rows = new ArrayList<>();
+            rows.add(new String[]{"- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", "", ""});
+//            printerHelper.printText("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", AlignStyle.PRINT_STYLE_CENTER);
 
-            // Print Column Titles (adjusted for 58mm paper)
-            final int TYPE_WIDTH = 18;
-            final int QTY_WIDTH = 6;
-            final int AMT_WIDTH = 8;
-            String header = padRight("Type", TYPE_WIDTH) +
-                    padRight(padLeft("Qty", QTY_WIDTH), QTY_WIDTH) +
-                    padLeft("Amount", AMT_WIDTH); // Right align 'Amount' title
-            printerHelper.printText(header, AlignStyle.PRINT_STYLE_LEFT);
-            printerHelper.printText("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", AlignStyle.PRINT_STYLE_CENTER);
 
-            // Print Data Rows
+
+            // Header row
+            rows.add(new String[]{"Type", "Qty", "Amt"});
+            rows.add(new String[]{"- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", "", ""});
+
+            //col
             for (TicketReport report : reportList) {
-                String row = padRight(report.vehicleType, TYPE_WIDTH) +
-                        // Right-align Qty
-                        padLeft(String.valueOf(report.count), QTY_WIDTH) +
-                        // Right-align Amount
-                        padLeft(String.valueOf(report.totalAmt), AMT_WIDTH);
-                printerHelper.printText(row, AlignStyle.PRINT_STYLE_LEFT);
+                rows.add(new String[]{
+                        report.vehicleType,                     // Type
+                        String.valueOf(report.count),           // Qty
+                        String.valueOf(report.totalAmt)         // Amt
+                });
             }
-            printerHelper.printText("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", AlignStyle.PRINT_STYLE_CENTER);
-            printerHelper.printLargeText("" + binding.textTotalCol.getText().toString(), 25, Paint.Align.CENTER);
 
+//            rows.add(new String[]{"", "", ""});
+            rows.add(new String[]{"- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", "", ""});
+            rows.add(new String[]{"Total ₹", "", binding.textTotalCol.getText().toString()});
+            printerHelper.printTable(rows);
 
             // ---- Finish Printing ----
             printerHelper.finishPrint();
@@ -166,10 +187,12 @@ public class ReportGenerateActivity extends AppCompatActivity {
     }
 
     private String padRight(String text, int length) {
+        if (text == null) text = "";
         return String.format("%-" + length + "s", text); // left aligned
     }
 
     private String padLeft(String text, int length) {
+        if (text == null) text = "";
         return String.format("%" + length + "s", text); // right aligned
     }
 }

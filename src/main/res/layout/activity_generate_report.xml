@@ -61,7 +61,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
-                android:fontFamily="sans-serif-light"
                 android:gravity="center"
                 android:text="VEHICLE WISE REPORT"
                 android:textSize="18sp"
@@ -79,11 +78,58 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:fontFamily="monospace"
                 android:gravity="center"
                 android:text="PAY &amp; PARK"
                 android:textSize="16sp"
                 android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:gravity="center"
+                    android:text="Date: "
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:gravity="center"
+                    android:text="00-00-0000"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:gravity="center"
+                    android:text="Time: "
+                    android:layout_marginStart="15dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:gravity="center"
+                    android:text="00:00"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+
+            </LinearLayout>
 
             <TextView
                 android:layout_width="match_parent"
@@ -152,7 +198,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:padding="10dp">
+                    android:padding="5dp">
 
                     <!-- Vehicle Type -->
                     <LinearLayout
@@ -172,7 +218,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="---------------"
+                            android:text="- - - - - - - - - - - - - - -"
                             android:textStyle="bold" />
 
                         <TextView
@@ -203,7 +249,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="---------------"
+                            android:text="- - - - - - - - - -"
                             android:layout_gravity="center"
                             android:textStyle="bold" />
 
@@ -236,7 +282,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="---------------"
+                            android:text="- - - - - - - - - -"
                             android:layout_gravity="center"
                             android:textStyle="bold" />
 
@@ -260,15 +306,33 @@
                 android:gravity="center"
                 android:text="------------------------------------------------------------"
                 android:textStyle="bold" />
-            <TextView
-                android:id="@+id/textTotalCol"
-                android:layout_width="wrap_content"
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Total Collection"
-                android:layout_marginStart="10dp"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:textSize="16sp" />
+                android:layout_weight="2"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Total Collection ₹ :"
+                    android:layout_marginStart="10dp"
+                    android:textStyle="bold"
+                    android:layout_weight="1"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/textTotalCol"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="00"
+                    android:layout_marginStart="10dp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

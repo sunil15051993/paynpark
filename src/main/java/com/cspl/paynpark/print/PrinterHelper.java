@@ -13,6 +13,8 @@ import com.ftpos.library.smartpos.errcode.ErrCode;
 import com.ftpos.library.smartpos.printer.OnPrinterCallback;
 import com.ftpos.library.smartpos.printer.Printer;
 
+import java.util.List;
+
 public class PrinterHelper {
 
     private static Paint paint = new Paint();
@@ -146,6 +148,49 @@ public class PrinterHelper {
         int width = 0;
         for (float w : widths) width += ceil(w);
         return width;
+    }
+
+    public void printTable(List<String[]> rows) {
+        try {
+            int paperWidth = 384; // 58mm printer width in pixels
+            int textSize = 24;
+
+            Paint tablePaint = new Paint();
+            tablePaint.setTextSize(textSize);
+            tablePaint.setColor(Color.BLACK);
+//            tablePaint.setTypeface(Typeface.MONOSPACE); // fixed width font
+
+            // Font height
+            Paint.FontMetrics fm = tablePaint.getFontMetrics();
+            int rowHeight = (int) (fm.bottom - fm.top + 10);
+
+            // Bitmap height = rows * rowHeight
+            int height = rowHeight * rows.size();
+            Bitmap bitmap = Bitmap.createBitmap(paperWidth, height, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            canvas.drawColor(Color.WHITE);
+
+            // Column positions
+            int col1X = 0;    // Type
+            int col2X = 220;  // Qty
+            int col3X = 320;  // Amt
+
+            int y = (int) -fm.top; // start baseline
+
+            for (String[] row : rows) {
+                if (row.length >= 3) {
+                    canvas.drawText(row[0], col1X, y, tablePaint);
+                    canvas.drawText(row[1], col2X, y, tablePaint);
+                    canvas.drawText(row[2], col3X, y, tablePaint);
+                }
+                y += rowHeight;
+            }
+
+            printer.printBmp(bitmap);
+            bitmap.recycle();
+        } catch (Exception e) {
+            Log.e("PrinterHelper", "printTable Exception: " + e.getMessage());
+        }
     }
 
 
