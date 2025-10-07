@@ -54,6 +54,22 @@
             android:padding="12dp"
             android:orientation="vertical">
 
+            <TextView
+                android:id="@+id/textTotalVehicle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Total Vehicle"
+                android:textStyle="bold"
+                android:textSize="16sp"/>
+
+            <TextView
+                android:id="@+id/textTotalCollection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Total Collection"
+                android:textStyle="bold"
+                android:textSize="16sp"/>
+
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputLayoutNo"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"

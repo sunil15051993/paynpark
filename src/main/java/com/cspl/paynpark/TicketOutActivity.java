@@ -74,7 +74,7 @@ public class TicketOutActivity extends AppCompatActivity {
             // get system serial
             serialNo = android.os.Build.getSerial();
             Log.e("POS_SN", "Serial Number: " + serialNo);
-            last4 = serialNo.substring(serialNo.length() - 4);
+            last4 = serialNo.substring(serialNo.length() - 6);
         } catch (SecurityException e) {
             e.printStackTrace();
             Log.e("POS_SN", "Permission required to read serial");
@@ -101,37 +101,50 @@ public class TicketOutActivity extends AppCompatActivity {
         String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
         binding.edittextOutDate.setText(currentDate);
 
-        binding.edittextOutTime.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Calendar calendar = Calendar.getInstance();
-                int hour = calendar.get(Calendar.HOUR_OF_DAY);
-                int minute = calendar.get(Calendar.MINUTE);
+        Calendar calendar = Calendar.getInstance();
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
 
-                // Create TimePickerDialog
-                TimePickerDialog timePickerDialog = new TimePickerDialog(TicketOutActivity.this,
-                        new TimePickerDialog.OnTimeSetListener() {
-                            @Override
-                            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                // Format time (HH:mm)
-                                int hour = hourOfDay % 12;
-                                if (hour == 0) {
-                                    hour = 12; // show 12 instead of 0
-                                }
-                                String amPm = (hourOfDay < 12) ? "AM" : "PM";
+        int displayHour = hour % 12;
+        if (displayHour == 0) {
+            displayHour = 12;
+        }
+        String amPm = (hour < 12) ? "AM" : "PM";
 
-                                String selectedTime = String.format(Locale.getDefault(), "%02d:%02d %s", hour, minute, amPm);
-                                binding.edittextOutTime.setText(selectedTime);
-                            }
-                        },
-                        hour,
-                        minute,
-                        false
-                );
+        String currentTime = String.format(Locale.getDefault(), "%02d:%02d %s", displayHour, minute, amPm);
+        binding.edittextOutTime.setText(currentTime);
 
-                timePickerDialog.show();
-            }
-        });
+//        binding.edittextOutTime.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Calendar calendar = Calendar.getInstance();
+//                int hour = calendar.get(Calendar.HOUR_OF_DAY);
+//                int minute = calendar.get(Calendar.MINUTE);
+//
+//                // Create TimePickerDialog
+//                TimePickerDialog timePickerDialog = new TimePickerDialog(TicketOutActivity.this,
+//                        new TimePickerDialog.OnTimeSetListener() {
+//                            @Override
+//                            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+//                                // Format time (HH:mm)
+//                                int hour = hourOfDay % 12;
+//                                if (hour == 0) {
+//                                    hour = 12; // show 12 instead of 0
+//                                }
+//                                String amPm = (hourOfDay < 12) ? "AM" : "PM";
+//
+//                                String selectedTime = String.format(Locale.getDefault(), "%02d:%02d %s", hour, minute, amPm);
+//                                binding.edittextOutTime.setText(selectedTime);
+//                            }
+//                        },
+//                        hour,
+//                        minute,
+//                        false
+//                );
+//
+//                timePickerDialog.show();
+//            }
+//        });
 
         binding.buttonGenerate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -189,7 +202,7 @@ public class TicketOutActivity extends AppCompatActivity {
                     }
 
 //                AppDatabase db = AppDatabase.getInstance(TicketOutActivity.this);
-                    db.ticketDao().updateTicket(recpNo, outTime, totalPrice);
+                    db.ticketDao().updateTicket(recpNo,inDate, outTime, totalPrice);
                     Intent generate = new Intent(TicketOutActivity.this, OutTicketGenerationActivity.class);
                     generate.putExtra("receipt_no", recpNo);
                     generate.putExtra("date", outDate);

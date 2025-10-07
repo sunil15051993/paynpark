@@ -44,7 +44,7 @@ class DashboardActivity : AppCompatActivity() {
     private fun init(){
         binding.imageRefresh.setOnClickListener { callGetPrice() }
         binding.imageLogout.setOnClickListener {
-            val intent = Intent(this@DashboardActivity, MainActivity::class.java)
+            val intent = Intent(this@DashboardActivity, LoginActivity::class.java)
             startActivity(intent)
             finish();
         }
@@ -63,6 +63,14 @@ class DashboardActivity : AppCompatActivity() {
         }
         binding.cardInput.setOnClickListener {
             val intent = Intent(this, FindActivity::class.java)
+            startActivity(intent)
+        }
+        binding.cardSetting.setOnClickListener {
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+        }
+        binding.cardStatus.setOnClickListener {
+            val intent = Intent(this, StatusReportActivity::class.java)
             startActivity(intent)
         }
 

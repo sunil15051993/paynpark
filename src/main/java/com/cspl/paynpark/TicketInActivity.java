@@ -2,6 +2,7 @@ package com.cspl.paynpark;
 
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -24,6 +25,8 @@ import com.cspl.paynpark.api.Api;
 import com.cspl.paynpark.databinding.ActivityTicketInBinding;
 import com.cspl.paynpark.dbhelper.AppDatabase;
 import com.cspl.paynpark.model.Ticket;
+import com.cspl.paynpark.model.TicketReport;
+import com.cspl.paynpark.model.TotalColReport;
 import com.cspl.paynpark.model.VehicFare;
 import com.cspl.paynpark.model.VehicType;
 
@@ -53,6 +56,7 @@ public class TicketInActivity extends AppCompatActivity {
     private SharedPreferences myPref;
     private AppDatabase db;
     String serialNo, last4;
+    private List<TotalColReport> reportList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +72,7 @@ public class TicketInActivity extends AppCompatActivity {
             // get system serial
             serialNo = android.os.Build.getSerial();
             Log.e("POS_SN", "Serial Number: " + serialNo);
-            last4 = serialNo.substring(serialNo.length() - 4);
+            last4 = serialNo.substring(serialNo.length() - 6);
         } catch (SecurityException e) {
             e.printStackTrace();
             Log.e("POS_SN", "Permission required to read serial");
@@ -82,6 +86,18 @@ public class TicketInActivity extends AppCompatActivity {
     }
 
     public void init() {
+        Executors.newSingleThreadExecutor().execute(() -> {
+            TotalColReport totalColReport = db.ticketDao().getTotalData();
+
+            runOnUiThread(() -> {
+                int noOfVeh = totalColReport != null ? totalColReport.totalVehicles : 0;
+                int totalCol = (totalColReport != null && totalColReport.totalCollection != null)
+                        ? totalColReport.totalCollection : 0;
+
+                binding.textTotalVehicle.setText("Total Vehicle : " + noOfVeh);
+                binding.textTotalCollection.setText("Total Collection : " + totalCol);
+            });
+        });
         binding.imageRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -117,37 +133,50 @@ public class TicketInActivity extends AppCompatActivity {
         String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
         binding.edittextDate.setText(currentDate);
 
-        binding.edittextInTime.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Calendar calendar = Calendar.getInstance();
-                int hour = calendar.get(Calendar.HOUR_OF_DAY);
-                int minute = calendar.get(Calendar.MINUTE);
+        Calendar calendar = Calendar.getInstance();
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
 
-                // Create TimePickerDialog
-                TimePickerDialog timePickerDialog = new TimePickerDialog(TicketInActivity.this,
-                        new TimePickerDialog.OnTimeSetListener() {
-                            @Override
-                            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                // Format time (HH:mm)
-                                int hour = hourOfDay % 12;
-                                if (hour == 0) {
-                                    hour = 12; // show 12 instead of 0
-                                }
-                                String amPm = (hourOfDay < 12) ? "AM" : "PM";
+        int displayHour = hour % 12;
+        if (displayHour == 0) {
+            displayHour = 12;
+        }
+        String amPm = (hour < 12) ? "AM" : "PM";
 
-                                String selectedTime = String.format(Locale.getDefault(), "%02d:%02d %s", hour, minute, amPm);
-                                binding.edittextInTime.setText(selectedTime);
-                            }
-                        },
-                        hour,
-                        minute,
-                        false
-                );
+        String currentTime = String.format(Locale.getDefault(), "%02d:%02d %s", displayHour, minute, amPm);
+        binding.edittextInTime.setText(currentTime);
 
-                timePickerDialog.show();
-            }
-        });
+//        binding.edittextInTime.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Calendar calendar = Calendar.getInstance();
+//                int hour = calendar.get(Calendar.HOUR_OF_DAY);
+//                int minute = calendar.get(Calendar.MINUTE);
+//
+//                // Create TimePickerDialog
+//                TimePickerDialog timePickerDialog = new TimePickerDialog(TicketInActivity.this,
+//                        new TimePickerDialog.OnTimeSetListener() {
+//                            @Override
+//                            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+//                                // Format time (HH:mm)
+//                                int hour = hourOfDay % 12;
+//                                if (hour == 0) {
+//                                    hour = 12; // show 12 instead of 0
+//                                }
+//                                String amPm = (hourOfDay < 12) ? "AM" : "PM";
+//
+//                                String selectedTime = String.format(Locale.getDefault(), "%02d:%02d %s", hour, minute, amPm);
+//                                binding.edittextInTime.setText(selectedTime);
+//                            }
+//                        },
+//                        hour,
+//                        minute,
+//                        false
+//                );
+//
+//                timePickerDialog.show();
+//            }
+//        });
 
         binding.buttonGenerate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -163,9 +192,7 @@ public class TicketInActivity extends AppCompatActivity {
                     binding.edittextInTime.setError("FIELD CANNOT BE EMPTY");
                 } else {
                     String date = binding.edittextDate.getText().toString();
-                    Random random = new Random();
-                    int randomNumber = random.nextInt(1000);  // generates 0–999
-                    String ticketNo = "PARK" + randomNumber;
+                    String ticketNo = generateTicketNo(TicketInActivity.this, date);
                     Log.e("TicketNumber", ticketNo);
                     String vehicleNo = binding.edittextVhicleNo.getText().toString();
                     String vehicleType = binding.spinnerVehicleType.getText().toString();
@@ -213,7 +240,30 @@ public class TicketInActivity extends AppCompatActivity {
                 }
             }
         });
+    }
 
+    private String generateTicketNo(Context context, String currentDate) {
+        SharedPreferences prefs = context.getSharedPreferences("TicketPrefs", MODE_PRIVATE);
+
+        // Get last stored date and ticket no
+        String lastDate = prefs.getString("last_date", "");
+        int lastTicketNo = prefs.getInt("last_ticket_no", 0);
+
+        int newTicketNo;
+        if (currentDate.equals(lastDate)) {
+            newTicketNo = lastTicketNo + 1;
+        } else {
+            newTicketNo = 1;
+        }
+
+        // Save back to prefs
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("last_date", currentDate);
+        editor.putInt("last_ticket_no", newTicketNo);
+        editor.apply();
+
+        // Format with leading zeros (0001, 0002…)
+        return String.format("%04d", newTicketNo);
     }
 
     private void callVehicleType() {

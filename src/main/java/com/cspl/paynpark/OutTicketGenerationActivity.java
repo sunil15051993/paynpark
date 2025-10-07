@@ -40,6 +40,7 @@ public class OutTicketGenerationActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         Bundle b = getIntent().getExtras();
+        assert b != null;
         String recpNo = b.getString("receipt_no", "");
         String date = b.getString("date", "");
         String vehNo = b.getString("vehicle_no", "");
@@ -54,7 +55,7 @@ public class OutTicketGenerationActivity extends AppCompatActivity {
 
         init(recpNo, date, vehNo, vehType, outTime, inTime, paid, amt, totalHrs,totalAmt,serial);
 
-        this.printer = MainActivity.printer;
+        this.printer = LoginActivity.printer;
         printerHelper = new PrinterHelper(printer);
     }
 
@@ -154,14 +155,14 @@ public class OutTicketGenerationActivity extends AppCompatActivity {
             String rightText = "S/N : " + binding.textSerialNo.getText().toString();
             String inDt = "IN TM: " + binding.textInTime.getText().toString();
             String inTime = "OT TM: " + binding.textOuttime.getText().toString();
-            String totalHrs = "Total Hrs: " + binding.textTotalHrs.getText().toString();
+            String totalHrs = "Min. Hrs: " + binding.textTotalHrs.getText().toString();
             String totalAmt = "Total Amt: " + binding.textTotalAmt.getText().toString();
 
             int lineChars = 32;
             int spaceCount = lineChars - leftText.length() - rightText.length();
             if (spaceCount < 0) spaceCount = 0; // Prevent negative spaces
             String spaces = new String(new char[spaceCount]).replace('\0', ' ');
-            String receiptLine = leftText + spaces + rightText;
+            String receiptLine = leftText + spaces + spaces + rightText;
 
             int spaceCount2 = lineChars - inDt.length() - inTime.length();
             if (spaceCount2 < 0) spaceCount2 = 0; // Prevent negative spaces
@@ -177,12 +178,12 @@ public class OutTicketGenerationActivity extends AppCompatActivity {
             printerHelper.printText(""+binding.textHeader1.getText(), AlignStyle.PRINT_STYLE_CENTER);
             printerHelper.printText("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", AlignStyle.PRINT_STYLE_CENTER);
             printerHelper.printText(receiptLine, AlignStyle.PRINT_STYLE_LEFT);
-            printerHelper.printText("Out Date : " + binding.textDate.getText(), AlignStyle.PRINT_STYLE_LEFT);
+            printerHelper.printText("Out Date : " + binding.textDate.getText(), AlignStyle.PRINT_STYLE_CENTER);
             printerHelper.printText(dateLine, AlignStyle.PRINT_STYLE_LEFT);
             printerHelper.printText("Vehicle Type : " + binding.textVehicleType.getText(), AlignStyle.PRINT_STYLE_LEFT);
-            printerHelper.printLargeText("Vehicle No : " + binding.textVehicleNo.getText().toString(), 30, Paint.Align.CENTER);
             printerHelper.printText(totalLine, AlignStyle.PRINT_STYLE_LEFT);
             printerHelper.printText("Paid : " + binding.textPaid.getText(), AlignStyle.PRINT_STYLE_CENTER);
+            printerHelper.printLargeText("Vehicle No : " + binding.textVehicleNo.getText().toString(), 30, Paint.Align.CENTER);
             printerHelper.printLargeText("Diff.amount : ₹ " + binding.textAmount.getText(), 30, Paint.Align.CENTER);
             printerHelper.printText("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", AlignStyle.PRINT_STYLE_CENTER);
 

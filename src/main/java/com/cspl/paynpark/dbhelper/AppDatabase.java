@@ -8,14 +8,16 @@ import androidx.room.RoomDatabase;
 
 import com.cspl.paynpark.dao.FareDao;
 import com.cspl.paynpark.dao.HeaderFooterDao;
+import com.cspl.paynpark.dao.LoginDao;
 import com.cspl.paynpark.dao.TicketDao;
 import com.cspl.paynpark.dao.TypeDao;
 import com.cspl.paynpark.model.HeaderFooter;
+import com.cspl.paynpark.model.LoginMaster;
 import com.cspl.paynpark.model.Ticket;
 import com.cspl.paynpark.model.VehicFare;
 import com.cspl.paynpark.model.VehicType;
 
-@Database(entities = {Ticket.class, VehicType.class, VehicFare.class, HeaderFooter.class}, version = 1, exportSchema = false)
+@Database(entities = {Ticket.class, VehicType.class, VehicFare.class, HeaderFooter.class, LoginMaster.class}, version = 1, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
     private static AppDatabase instance;
 
@@ -23,6 +25,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract TypeDao typeDao();
     public abstract FareDao fareDao();
     public abstract HeaderFooterDao headerFooterDao();
+    public abstract LoginDao loginDao();
 
     public static synchronized AppDatabase getInstance(Context context) {
         if (instance == null) {

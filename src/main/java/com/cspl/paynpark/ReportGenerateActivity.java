@@ -43,7 +43,7 @@ public class ReportGenerateActivity extends AppCompatActivity {
         String emp = "abcd";
         Log.e("Report", "onCreate: "+ date);
 
-        this.printer = MainActivity.printer;
+        this.printer = LoginActivity.printer;
         printerHelper = new PrinterHelper(printer);
 
         initMethod(date,emp);
@@ -174,7 +174,7 @@ public class ReportGenerateActivity extends AppCompatActivity {
 
 //            rows.add(new String[]{"", "", ""});
             rows.add(new String[]{"- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", "", ""});
-            rows.add(new String[]{"Total ₹", "", binding.textTotalCol.getText().toString()});
+            rows.add(new String[]{"Total", "", "₹" + binding.textTotalCol.getText().toString()});
             printerHelper.printTable(rows);
 
             // ---- Finish Printing ----

@@ -53,7 +53,7 @@ public class InTicketGenerationActivity extends AppCompatActivity {
         int amtPerHr = b.getInt("amt_per_hr", 0);
 
         init(recpNo, date, vehNo, vehType, inTime, amtPerHr, serial);
-        this.printer = MainActivity.printer;
+        this.printer = LoginActivity.printer;
         printerHelper = new PrinterHelper(printer);
     }
 
@@ -167,8 +167,8 @@ public class InTicketGenerationActivity extends AppCompatActivity {
             int lineChars = 32;
             int spaceCount = lineChars - leftText.length() - rightText.length();
             if (spaceCount < 0) spaceCount = 0; // Prevent negative spaces
-            String spaces = new String(new char[spaceCount]).replace('\0', ' ');
-            String receiptLine = leftText + spaces + rightText;
+            String spaces = new String(new char[spaceCount]).replace('\00', ' ');
+            String receiptLine = leftText + spaces + spaces + rightText;
 
             int spaceCount2 = lineChars - inDt.length() - inTime.length();
             if (spaceCount2 < 0) spaceCount2 = 0; // Prevent negative spaces

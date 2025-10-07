@@ -70,6 +70,13 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="---------------------------------------------"
+                android:textStyle="bold" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -110,6 +117,7 @@
                     android:layout_weight="0"
                     android:fontFamily="sans-serif-medium"
                     android:text="S/N"
+                    android:layout_marginStart="15dp"
                     android:textSize="15sp" />
 
                 <TextView
@@ -279,41 +287,6 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:fontFamily="sans-serif-medium"
-                    android:text="Vehicle No."
-                    android:textSize="15sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.2"
-                    android:fontFamily="sans-serif-medium"
-                    android:gravity="center"
-                    android:text=":"
-                    android:textSize="15sp" />
-
-                <TextView
-                    android:id="@+id/textVehicleNo"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="GJ05"
-                    android:textStyle="bold"
-                    android:textSize="15sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:weightSum="3">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:fontFamily="sans-serif-medium"
                     android:text="Total Hrs"
                     android:textSize="15sp" />
 
@@ -416,6 +389,41 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:fontFamily="sans-serif-medium"
+                    android:text="Vehicle No."
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.2"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="center"
+                    android:text=":"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/textVehicleNo"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="GJ05"
+                    android:textStyle="bold"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:weightSum="3">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="sans-serif-medium"
                     android:text="Diff.Amount"
                     android:textSize="15sp" />
 
@@ -439,15 +447,11 @@
                     android:textSize="15sp" />
             </LinearLayout>
 
-            <ImageView
-                android:id="@+id/textQR"
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:contentDescription="QR"
-                android:fontFamily="monospace"
                 android:gravity="center"
-                android:textSize="16sp"
+                android:text="---------------------------------------------"
                 android:textStyle="bold" />
 
             <TextView
