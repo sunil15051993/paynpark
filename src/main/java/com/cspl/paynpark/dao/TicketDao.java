@@ -38,4 +38,7 @@ public interface TicketDao {
     List<StatusReport> getStatusByDate(String date);
     @Query("SELECT COUNT(vehicleNo) as totalVehicles, SUM(amount) as totalCollection FROM tickets")
     TotalColReport getTotalData();
+
+    @Query("DELETE FROM tickets")
+    void deleteAllTickets();
 }

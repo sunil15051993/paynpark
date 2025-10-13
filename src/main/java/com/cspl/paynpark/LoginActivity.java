@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,8 +31,10 @@ import com.ftpos.library.smartpos.servicemanager.ServiceManager;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -45,6 +48,7 @@ public class LoginActivity extends AppCompatActivity {
     private SharedPreferences myPref;
     private AppDatabase db;
     private boolean call;
+    List<String> loginType = Arrays.asList("Operator", "Supervisor", "Admin");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +79,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void init() {
+        ArrayAdapter<String> adapterDuration = new ArrayAdapter<>(LoginActivity.this, android.R.layout.simple_dropdown_item_1line, loginType);
+        binding.spinnerType.setAdapter(adapterDuration);
         binding.buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -88,11 +94,86 @@ public class LoginActivity extends AppCompatActivity {
                     if (!call) {
                         callLoginApi();
                     } else {
-                        callLoginDB();
+                        String selectedType = binding.spinnerType.getText().toString().trim();
+                        Log.e("LOGIN", "onClick: "+ selectedType);
+                        if (selectedType.equalsIgnoreCase("Admin")) {
+                            callAdminApi();
+                        } else {
+                            callLoginDB();
+                        }
                     }
                 }
             }
         });
+    }
+
+    private void callAdminApi() {
+        pdDialog = new ProgressDialog(LoginActivity.this);
+        pdDialog.setTitle("Please wait...");
+        pdDialog.setCancelable(false);
+
+        String url = Api.SIGN_IN;
+        Log.e("res_type", url);
+        pdDialog.show();
+
+        StringRequest stringRequest = new StringRequest(
+                Request.Method.POST,
+                url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        pdDialog.dismiss();
+                        try {
+                            Log.e("res_login", response);
+                            Log.e("res_login", url);
+
+                            JSONObject rootObj = new JSONObject(response);
+                            boolean status = rootObj.getBoolean("status");
+                            String message = rootObj.getString("message");
+
+                            if (status) {
+                                JSONObject userObj = rootObj.getJSONObject("user");
+
+                                String name = userObj.optString("name", "");
+                                String email = userObj.optString("email", "");
+                                int companyId = userObj.optInt("company_id", 0);
+                                String serialNumber = userObj.optString("serial_number", "");
+                                String position = userObj.optString("position", "");
+                                String type = userObj.optString("type", "");
+
+                                startActivity(new Intent(LoginActivity.this, AdminDashboardActivity.class));
+                            }else {
+                                Toast.makeText(LoginActivity.this, "User not found", Toast.LENGTH_SHORT).show();
+                            }
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Log.e("category_error", "Error: " + e.getMessage());
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        pdDialog.dismiss();
+                        Log.e("RequestError", "Registration Error: " + error);
+                        Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("name", binding.edittextUser.getText().toString());
+                params.put("password", binding.edittextPass.getText().toString());
+                params.put("serial_number", "525788");
+                Log.e("res_login", "getParams: "+ params);
+                return params;
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(LoginActivity.this);
+        requestQueue.add(stringRequest);
     }
 
     private void callLoginApi() {
@@ -130,7 +211,7 @@ public class LoginActivity extends AppCompatActivity {
                                 String type = userObj.optString("type", "");
 
                                 // Save into Room DB
-                                LoginMaster loginMaster = new LoginMaster(name, "123456",position, serialNumber, "", "");
+                                LoginMaster loginMaster = new LoginMaster(name, binding.edittextPass.getText().toString(),position, serialNumber, "", "");
                                 Executors.newSingleThreadExecutor().execute(() -> db.loginDao().insert(loginMaster));
 
                                 // Also save login flag in SharedPreferences
@@ -183,10 +264,10 @@ public class LoginActivity extends AppCompatActivity {
 
                     if ("Operator".equalsIgnoreCase(role)) {
                         startActivity(new Intent(this, DashboardActivity.class));
-                    } else if ("Admin".equalsIgnoreCase(role)) {
-                        startActivity(new Intent(this, DashboardActivity.class));
+                    } else if ("Supervisor".equalsIgnoreCase(role)) {
+                        startActivity(new Intent(this, SuperDashboardActivity.class));
                     } else {
-                        Toast.makeText(this, "Unknown role: " + role, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Unknown role", Toast.LENGTH_SHORT).show();
                         return;
                     }
 

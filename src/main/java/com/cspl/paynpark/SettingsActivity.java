@@ -20,6 +20,7 @@ import com.cspl.paynpark.databinding.ActivityFindBinding;
 import com.cspl.paynpark.databinding.ActivitySettingsBinding;
 import com.cspl.paynpark.dbhelper.AppDatabase;
 import com.cspl.paynpark.model.HeaderFooter;
+import com.cspl.paynpark.model.LoginMaster;
 import com.cspl.paynpark.model.VehicFare;
 import com.cspl.paynpark.model.VehicType;
 
@@ -36,12 +37,15 @@ public class SettingsActivity extends AppCompatActivity {
     private ActivitySettingsBinding binding;
     private ProgressDialog pdDialog;
     private SharedPreferences myPref;
+    private AppDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivitySettingsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        db = AppDatabase.getInstance(SettingsActivity.this);
 
         initView();
 
@@ -57,7 +61,7 @@ public class SettingsActivity extends AppCompatActivity {
         binding.buttonLoginSynch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                callLoginMaster();
             }
         });
 
@@ -81,6 +85,83 @@ public class SettingsActivity extends AppCompatActivity {
                 callGetHeaderFooter();
             }
         });
+    }
+
+    private void callLoginMaster() {
+        pdDialog = new ProgressDialog(SettingsActivity.this);
+        pdDialog.setTitle("Please wait...");
+        pdDialog.setCancelable(false);
+
+        String url = Api.LOGIN_MASTER;
+
+        pdDialog.show();
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        pdDialog.dismiss();
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+
+                            boolean status = jsonObject.getBoolean("status");
+                            String message = jsonObject.getString("message");
+
+                            if (status) {
+
+                                JSONObject userObj = jsonObject.getJSONObject("user");
+                                String name = userObj.getString("name");
+                                String serialNumber = userObj.getString("serial_number");
+                                String position = userObj.getString("position");
+
+
+                                //Get POS Users Array
+                                JSONArray posUsersArray = jsonObject.getJSONArray("pos_users");
+
+                                for (int i = 0; i < posUsersArray.length(); i++) {
+                                    JSONObject recordObj = posUsersArray.getJSONObject(i);
+
+                                    String userName = recordObj.getString("name");
+                                    String userPwd = recordObj.getString("password");
+                                    String userPosition = recordObj.getString("position");
+
+                                    LoginMaster loginMaster = new LoginMaster(userName, userPwd, userPosition, serialNumber, "", "");
+                                    Executors.newSingleThreadExecutor().execute(() -> db.loginDao().insert(loginMaster));
+                                }
+
+                                Log.d("API", "Admin and POS users inserted successfully");
+                                Toast.makeText(SettingsActivity.this, "Successfully Updated", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(SettingsActivity.this, "Not Updated", Toast.LENGTH_SHORT).show();
+                                Log.e("API", "Login failed: " + message);
+                            }
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Log.e("API Error", "Exception: " + e.getMessage());
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        pdDialog.dismiss();
+                        Log.e("RequestError", "Registration Error: " + error.toString());
+                        Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                    }
+                }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("name", "Cursor Enterprice");
+                params.put("serial_number", "525788");
+                return params;
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(SettingsActivity.this);
+        requestQueue.add(stringRequest);
+
     }
 
     private void callVehicleType() {
