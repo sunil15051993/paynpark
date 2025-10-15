@@ -3,6 +3,7 @@ package com.cspl.paynpark;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,6 +21,7 @@ import com.ftpos.library.smartpos.printer.AlignStyle;
 import com.ftpos.library.smartpos.printer.PrintStatus;
 import com.ftpos.library.smartpos.printer.Printer;
 import com.google.zxing.BarcodeFormat;
+import com.google.zxing.common.BitMatrix;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 import com.google.zxing.WriterException;
 import com.google.zxing.qrcode.QRCodeWriter;
@@ -139,6 +141,36 @@ public class InTicketGenerationActivity extends AppCompatActivity {
             }
         });
 
+        generateUpiQR();
+
+    }
+
+    private void generateUpiQR() {
+        String upiId = "merchant@upi";
+        String name = "My Shop";
+        String amount = "50.00";
+        String note = "Order #1234";
+
+        // Standard UPI URI
+        String upiString = "upi://pay?pa=" + upiId + "&pn=" + name + "&am=" + amount + "&cu=INR&tn=" + note;
+
+        try {
+            QRCodeWriter writer = new QRCodeWriter();
+            BitMatrix bitMatrix = writer.encode(upiString, BarcodeFormat.QR_CODE, 500, 500);
+
+            Bitmap bitmap = Bitmap.createBitmap(500, 500, Bitmap.Config.RGB_565);
+
+            for (int x = 0; x < 500; x++) {
+                for (int y = 0; y < 500; y++) {
+                    bitmap.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
+                }
+            }
+
+            binding.imageUPI.setImageBitmap(bitmap);
+
+        } catch (WriterException e) {
+            e.printStackTrace();
+        }
     }
 
     private void printReceipt() {

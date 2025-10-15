@@ -341,6 +341,13 @@
                     android:gravity="center" />
 
             </LinearLayout>
+
+            <ImageView
+                android:id="@+id/imageUPI"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+
         </LinearLayout>
 
     </ScrollView>

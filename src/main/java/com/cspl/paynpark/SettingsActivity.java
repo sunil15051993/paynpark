@@ -153,8 +153,8 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
-                params.put("name", "Cursor Enterprice");
-                params.put("serial_number", "525788");
+                params.put("name", "abc");
+                params.put("serial_number", "546788");
                 return params;
             }
         };
@@ -173,7 +173,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         pdDialog.show();
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -285,7 +285,7 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
-                params.put("username", "abcd");
+                params.put("username", "abc");
                 return params;
             }
         };
@@ -351,7 +351,7 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
-                params.put("username", "abcd");
+                params.put("username", "abc");
                 return params;
             }
         };

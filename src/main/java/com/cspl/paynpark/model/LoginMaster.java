@@ -1,13 +1,17 @@
 package com.cspl.paynpark.model;
 
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "loginmaster")
+@Entity(tableName = "loginmaster",
+        indices = {@Index(value = {"userId"}, unique = true)})
 public class LoginMaster {
     @PrimaryKey(autoGenerate = true)
     private int id;
 
+    @NonNull
     private String userId;
     private String userPwd;
     private String role;

@@ -1,21 +1,19 @@
 package com.cspl.paynpark
 
 import android.app.DatePickerDialog
-import android.app.TimePickerDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import com.cspl.paynpark.databinding.ActivityReportBinding
+import com.cspl.paynpark.databinding.ActivityDateReportBinding
 import java.util.Calendar
-import java.util.Locale
 
-class ReportActivity : AppCompatActivity() {
-    private var binding: ActivityReportBinding? = null
+class DateWiseReportActivity : AppCompatActivity() {
+    private var binding: ActivityDateReportBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityReportBinding.inflate(layoutInflater)
+        binding = ActivityDateReportBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())
 
         initCall()
@@ -49,7 +47,7 @@ class ReportActivity : AppCompatActivity() {
 
         binding?.buttonGenerate?.setOnClickListener {
 
-            val intent = Intent(this@ReportActivity,ReportGenerateActivity::class.java)
+            val intent = Intent(this@DateWiseReportActivity,ReportGenerateActivity::class.java)
             intent.putExtra("date", binding!!.edittextSelectDate.text.toString())
             startActivity(intent)
 

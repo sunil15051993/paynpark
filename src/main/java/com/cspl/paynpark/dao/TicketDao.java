@@ -1,13 +1,16 @@
 package com.cspl.paynpark.dao;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
 
+import com.cspl.paynpark.model.LoginMaster;
 import com.cspl.paynpark.model.StatusReport;
 import com.cspl.paynpark.model.Ticket;
 import com.cspl.paynpark.model.TicketReport;
 import com.cspl.paynpark.model.TotalColReport;
+import com.cspl.paynpark.model.VhReport;
 
 import java.util.List;
 @Dao
@@ -27,6 +30,10 @@ public interface TicketDao {
     @Query("SELECT vehicleType, COUNT(*) as count, SUM(amount) as totalAmt " +
             "FROM tickets WHERE date = :date AND log = :emp GROUP BY vehicleType")
     List<TicketReport> getReportByDate(String date, String emp);
+
+    @Query("SELECT vehicleNo, inTime AS inTM, outTime AS outTM " +
+            "FROM tickets WHERE date = :date AND vehicleType = :vhType")
+    List<VhReport> getReportByVehicle(String date, String vhType);
 
     @Query("SELECT vehicleType, " +
             "SUM(CASE WHEN inTime IS NOT NULL AND (outTime IS NULL OR outTime = '') THEN 1 ELSE 0 END) AS inCount, " +

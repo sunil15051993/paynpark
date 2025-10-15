@@ -58,7 +58,7 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ReportActivity"
+            android:name=".DateWiseReportActivity"
             android:exported="false"
             android:screenOrientation="portrait"/>
         <activity
@@ -79,6 +79,18 @@
             android:screenOrientation="portrait"/>
         <activity
             android:name=".SuperDashboardActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".UserWiseReportActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".VehicleWiseReportActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".VehicleReportGenerateActivity"
             android:exported="false"
             android:screenOrientation="portrait"/>
     </application>

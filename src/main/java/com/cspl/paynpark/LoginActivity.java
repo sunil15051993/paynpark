@@ -73,6 +73,7 @@ public class LoginActivity extends AppCompatActivity {
         myPref = getSharedPreferences("paynpark", MODE_PRIVATE);
         call = myPref.getBoolean("api_login", false);
         db = AppDatabase.getInstance(LoginActivity.this);
+        Log.e("LOGIN", "onCreate: "+ call);
 
         init();
 
@@ -97,7 +98,7 @@ public class LoginActivity extends AppCompatActivity {
                         String selectedType = binding.spinnerType.getText().toString().trim();
                         Log.e("LOGIN", "onClick: "+ selectedType);
                         if (selectedType.equalsIgnoreCase("Admin")) {
-                            callAdminApi();
+                            callLoginApi();
                         } else {
                             callLoginDB();
                         }
@@ -105,75 +106,6 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
-    }
-
-    private void callAdminApi() {
-        pdDialog = new ProgressDialog(LoginActivity.this);
-        pdDialog.setTitle("Please wait...");
-        pdDialog.setCancelable(false);
-
-        String url = Api.SIGN_IN;
-        Log.e("res_type", url);
-        pdDialog.show();
-
-        StringRequest stringRequest = new StringRequest(
-                Request.Method.POST,
-                url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        pdDialog.dismiss();
-                        try {
-                            Log.e("res_login", response);
-                            Log.e("res_login", url);
-
-                            JSONObject rootObj = new JSONObject(response);
-                            boolean status = rootObj.getBoolean("status");
-                            String message = rootObj.getString("message");
-
-                            if (status) {
-                                JSONObject userObj = rootObj.getJSONObject("user");
-
-                                String name = userObj.optString("name", "");
-                                String email = userObj.optString("email", "");
-                                int companyId = userObj.optInt("company_id", 0);
-                                String serialNumber = userObj.optString("serial_number", "");
-                                String position = userObj.optString("position", "");
-                                String type = userObj.optString("type", "");
-
-                                startActivity(new Intent(LoginActivity.this, AdminDashboardActivity.class));
-                            }else {
-                                Toast.makeText(LoginActivity.this, "User not found", Toast.LENGTH_SHORT).show();
-                            }
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            Log.e("category_error", "Error: " + e.getMessage());
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        pdDialog.dismiss();
-                        Log.e("RequestError", "Registration Error: " + error);
-                        Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_LONG).show();
-                    }
-                }
-        ) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                params.put("name", binding.edittextUser.getText().toString());
-                params.put("password", binding.edittextPass.getText().toString());
-                params.put("serial_number", "525788");
-                Log.e("res_login", "getParams: "+ params);
-                return params;
-            }
-        };
-
-        RequestQueue requestQueue = Volley.newRequestQueue(LoginActivity.this);
-        requestQueue.add(stringRequest);
     }
 
     private void callLoginApi() {
@@ -210,16 +142,21 @@ public class LoginActivity extends AppCompatActivity {
                                 String position = userObj.optString("position", "");
                                 String type = userObj.optString("type", "");
 
-                                // Save into Room DB
-                                LoginMaster loginMaster = new LoginMaster(name, binding.edittextPass.getText().toString(),position, serialNumber, "", "");
-                                Executors.newSingleThreadExecutor().execute(() -> db.loginDao().insert(loginMaster));
+                                if(position.equals("Admin")){
+                                    startActivity(new Intent(LoginActivity.this, AdminDashboardActivity.class));
+                                }else {
+                                    // Save into Room DB
+                                    LoginMaster loginMaster = new LoginMaster(name, binding.edittextPass.getText().toString(), position, serialNumber, "", "");
+                                    Executors.newSingleThreadExecutor().execute(() -> db.loginDao().insert(loginMaster));
+                                    callLoginDB();
+                                }
 
                                 // Also save login flag in SharedPreferences
                                 SharedPreferences.Editor editor = myPref.edit();
                                 editor.putBoolean("api_login", true);
                                 editor.apply();
 
-                                callLoginDB();
+
                             }else {
                                 Toast.makeText(LoginActivity.this, "User not found", Toast.LENGTH_SHORT).show();
                             }
@@ -244,7 +181,7 @@ public class LoginActivity extends AppCompatActivity {
                 Map<String, String> params = new HashMap<>();
                 params.put("name", binding.edittextUser.getText().toString());
                 params.put("password", binding.edittextPass.getText().toString());
-                params.put("serial_number", "525788");
+                params.put("serial_number", "546788");
                 Log.e("res_login", "getParams: "+ params);
                 return params;
             }
@@ -256,7 +193,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void callLoginDB() {
         Executors.newSingleThreadExecutor().execute(() -> {
-            LoginMaster loginMaster = db.loginDao().login(binding.edittextUser.getText().toString(), binding.edittextPass.getText().toString(), "525788");
+            LoginMaster loginMaster = db.loginDao().login(binding.edittextUser.getText().toString(), binding.edittextPass.getText().toString(), "546788");
 
             runOnUiThread(() -> {
                 if (loginMaster != null) {
