@@ -43,6 +43,11 @@ class SuperDashboardActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        binding.cardVehicleWise.setOnClickListener {
+            val intent = Intent(this@SuperDashboardActivity, VehicleWiseReportActivity::class.java)
+            startActivity(intent)
+        }
+
     }
 
     override fun onBackPressed() {

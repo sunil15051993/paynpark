@@ -54,7 +54,7 @@ class DashboardActivity : AppCompatActivity() {
         }
         binding.cardReport.setOnClickListener {
 //            binding.iconReport.setImageResource(R.mipmap.ic_report_clr)
-            val intent = Intent(this@DashboardActivity, VehicleWiseReportActivity::class.java)
+            val intent = Intent(this@DashboardActivity, DateWiseReportActivity::class.java)
             startActivity(intent)
         }
         binding.cardScan.setOnClickListener {

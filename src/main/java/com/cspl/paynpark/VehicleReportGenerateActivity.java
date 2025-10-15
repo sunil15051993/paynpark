@@ -159,7 +159,7 @@ public class VehicleReportGenerateActivity extends AppCompatActivity {
 
 
             // Header row
-            rows.add(new String[]{"Type", "Qty", "Amt"});
+            rows.add(new String[]{"Vhicle", "IN", "OUT"});
             rows.add(new String[]{"- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", "", ""});
 
             //col
